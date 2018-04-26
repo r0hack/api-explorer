@@ -59,12 +59,16 @@ class KeyVars extends React.Component {
         });
       }
     } catch (e) {
+      // set to name of variable from api calls
       this.setState({ value: data });
     }
   }
 
   updateSelected(i) {
-    this.setState({ selected: i });
+    this.setState({
+      selected: i,
+      value: cookie.keys[i][variableName],
+    });
   }
 
   handleClick() {
@@ -130,7 +134,7 @@ class KeyVars extends React.Component {
         <script type="text/javascript" id={`variable${id}`}>
           <div id="variableDropdown" className="ns-popover-tooltip">
             <div className="ns-triangle" />
-            <div className="triange" />
+            <div className="triangle" />
             <ul>
               {this.state.project_names.map((name, index) => (
                 <li>
