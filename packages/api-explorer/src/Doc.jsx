@@ -5,6 +5,7 @@ const oasToHar = require('./lib/oas-to-har');
 const isAuthReady = require('./lib/is-auth-ready');
 const extensions = require('@readme/oas-extensions');
 const Waypoint = require('react-waypoint');
+const { ScrollableAnchor, configureAnchors } = require('react-scrollable-anchor');
 
 const { Fragment } = React;
 
@@ -39,6 +40,10 @@ class Doc extends React.Component {
     this.waypointEntered = this.waypointEntered.bind(this);
 
     this.setApiKey();
+  }
+
+  componentWillMount() {
+    configureAnchors({});
   }
 
   onChange(formData) {
@@ -275,24 +280,26 @@ class Doc extends React.Component {
 
         <div className="hub-reference-section hub-reference-section-top">
           <div className="hub-reference-left">
-            <header>
-              {this.props.suggestedEdits && (
-                // eslint-disable-next-line jsx-a11y/href-no-hash
-                <a className="hub-reference-edit pull-right" href={`reference-edit/${doc.slug}`}>
-                  <i className="icon icon-register" />
-                  Suggest Edits
-                </a>
-              )}
-              <h2>{doc.title}</h2>
-              {doc.excerpt && (
-                <div className="excerpt">
-                  {
-                    // eslint-disable-next-line react/no-danger
-                    <p dangerouslySetInnerHTML={{ __html: doc.excerpt }} />
-                  }
-                </div>
-              )}
-            </header>
+            <ScrollableAnchor id={`reference-edit/${doc.slug}`}>
+              <header>
+                {this.props.suggestedEdits && (
+                  // eslint-disable-next-line jsx-a11y/href-no-hash
+                  <a className="hub-reference-edit pull-right" href={`reference-edit/${doc.slug}`}>
+                    <i className="icon icon-register" />
+                    Suggest Edits
+                  </a>
+                )}
+                <h2>{doc.title}</h2>
+                {doc.excerpt && (
+                  <div className="excerpt">
+                    {
+                      // eslint-disable-next-line react/no-danger
+                      <p dangerouslySetInnerHTML={{ __html: doc.excerpt }} />
+                    }
+                  </div>
+                )}
+              </header>
+            </ScrollableAnchor>
           </div>
           <div className="hub-reference-right">&nbsp;</div>
         </div>
