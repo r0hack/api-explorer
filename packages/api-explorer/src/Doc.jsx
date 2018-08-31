@@ -4,7 +4,7 @@ const fetchHar = require('fetch-har');
 const oasToHar = require('./lib/oas-to-har');
 const isAuthReady = require('./lib/is-auth-ready');
 const extensions = require('@readme/oas-extensions');
-const Waypoint = require('react-waypoint');
+// const Waypoint = require('react-waypoint');
 
 const { Fragment } = React;
 
@@ -300,9 +300,11 @@ class Doc extends React.Component {
           <div className="hub-reference-right">&nbsp;</div>
         </div>
 
-        <Waypoint onEnter={this.waypointEntered} fireOnRapidScroll={false} bottomOffset="-1%">
+        {this.renderEndpoint()}
+
+        {/*<Waypoint onEnter={this.waypointEntered} fireOnRapidScroll={false} bottomOffset="-1%">
           {this.state.showEndpoint && this.renderEndpoint()}
-        </Waypoint>
+        </Waypoint>*/}
 
         {
           // TODO maybe we dont need to do this with a hidden input now

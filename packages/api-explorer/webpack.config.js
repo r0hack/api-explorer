@@ -12,7 +12,7 @@ module.exports = {
     ],
   },
   output: {
-    filename: './dist/index.js',
+    filename: './dist/api-explorer.js',
     libraryTarget: 'commonjs2',
   },
   resolve: {

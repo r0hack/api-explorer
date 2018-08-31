@@ -1,4 +1,4 @@
-const CodeMirror = require('codemirror');
+const CodeMirror = require('codemirror/addon/runmode/runmode.node.js');
 require('codemirror/addon/runmode/runmode');
 require('codemirror/mode/meta.js');
 
