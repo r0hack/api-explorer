@@ -14,8 +14,10 @@ require('../../packages/api-explorer/api-explorer.css');
 class Demo extends React.Component {
   constructor(props) {
     super(props);
+    this.textarea = React.createRef();
     this.state = { status: [], oas: {}, docs: [] };
     this.fetchSwagger = this.fetchSwagger.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
     this.convertSwagger = this.convertSwagger.bind(this);
     this.updateStatus = this.updateStatus.bind(this);
   }
@@ -42,6 +44,20 @@ class Demo extends React.Component {
       }, 1000);
     });
   }
+
+  onSubmit(event) {
+    event.preventDefault();
+
+    const node = this.textarea.current;
+    let json;
+    try {
+      json = JSON.parse(node.value);
+    } catch (e) {
+      return alert('This is not valid JSON!'); // eslint-disable-line no-alert
+    }
+    return this.dereference(json);
+  }
+
   convertSwagger(swagger) {
     this.updateStatus('Converting swagger file to OAS 3', () => {
       swagger2openapi.convertObj(swagger, {})
@@ -58,6 +74,15 @@ class Demo extends React.Component {
           <ApiList fetchSwagger={this.fetchSwagger} />
           <pre>{this.state.status.join('\n')}</pre>
         </div>
+        <form onSubmit={this.onSubmit} className="input-container">
+          <label htmlFor="json-text">
+            Input arbitrary json
+            <br />
+            <textarea id="json-text" rows={5} ref={this.textarea} />
+          </label>
+          <br />
+          <input type="submit" />
+        </form>
         {
           this.state.status.length === 0 && (
             <ApiExplorer
