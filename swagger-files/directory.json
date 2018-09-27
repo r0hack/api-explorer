@@ -63,11 +63,27 @@
       }
     }
   },
+  "read-only.json": {
+    "preferred": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "swaggerUrl": "swagger-files/read-only.json"
+      }
+    }
+  },
   "types.json": {
     "preferred": "1.0.0",
     "versions": {
       "1.0.0": {
         "swaggerUrl": "swagger-files/types.json"
+      }
+    }
+  },
+  "x-headers.json": {
+    "preferred": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "swaggerUrl": "swagger-files/x-headers.json"
       }
     }
   }
