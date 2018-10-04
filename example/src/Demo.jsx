@@ -10,6 +10,7 @@ const Logs = require('../../packages/api-logs');
 const ApiList = require('./ApiList');
 
 require('../../example/swagger-files/types.json');
+require('../../example/swagger-files/response-schema.json');
 require('../../packages/api-explorer/api-explorer.css');
 
 function Demo({ fetchSwagger, status, docs, oas, oauth }) {
