@@ -1,12 +1,4 @@
 {
-  "asm-august.json": {
-    "preferred": "1.0",
-    "versions": {
-      "1.0": {
-        "swaggerUrl": "swagger-files/asm-august.json"
-      }
-    }
-  },
   "boolean.json": {
     "preferred": "1.0.0",
     "versions": {
@@ -39,6 +31,14 @@
       }
     }
   },
+  "gh-issue-157.json": {
+    "preferred": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "swaggerUrl": "swagger-files/gh-issue-157.json"
+      }
+    }
+  },
   "multiple-securities.json": {
     "preferred": "1.0.0",
     "versions": {
@@ -60,14 +60,6 @@
     "versions": {
       "1.0.0": {
         "swaggerUrl": "swagger-files/raw-body.json"
-      }
-    }
-  },
-  "read-only.json": {
-    "preferred": "1.0.0",
-    "versions": {
-      "1.0.0": {
-        "swaggerUrl": "swagger-files/read-only.json"
       }
     }
   },
