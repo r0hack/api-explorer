@@ -63,6 +63,14 @@
       }
     }
   },
+  "response-schemas.json": {
+    "preferred": "1.0",
+    "versions": {
+      "1.0": {
+        "swaggerUrl": "swagger-files/response-schemas.json"
+      }
+    }
+  },
   "types.json": {
     "preferred": "1.0.0",
     "versions": {
