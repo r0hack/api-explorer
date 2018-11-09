@@ -1,5 +1,8 @@
 module.exports = {
-  entry: ['whatwg-fetch', './src/index.jsx'],
+  entry: {
+    'api-explorer': ['whatwg-fetch', './src/index.jsx'],
+    'content': './src/block-types/Content.jsx',
+  },
   module: {
     rules: [
       {
@@ -15,7 +18,7 @@ module.exports = {
     ],
   },
   output: {
-    filename: './dist/index.js',
+    filename: './dist/[name].js',
     libraryTarget: 'commonjs2',
   },
   resolve: {

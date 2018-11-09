@@ -2,7 +2,7 @@
   "name": "@readme/api-explorer",
   "description": "UI components for the API explorer",
   "version": "2.3.0",
-  "main": "dist/index.js",
+  "main": "dist/api-explorer.js",
   "dependencies": {
     "@readme/markdown": "^2.3.0",
     "@readme/oas-extensions": "^2.2.0",
