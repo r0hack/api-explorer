@@ -1,7 +1,7 @@
 module.exports = {
   entry: {
     'api-explorer': ['whatwg-fetch', './src/index.jsx'],
-    'content': './src/block-types/Content.jsx',
+    content: './src/block-types/Content.jsx',
   },
   module: {
     rules: [
