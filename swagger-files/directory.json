@@ -7,6 +7,14 @@
       }
     }
   },
+  "auth-types.json": {
+    "preferred": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "swaggerUrl": "swagger-files/auth-types.json"
+      }
+    }
+  },
   "boolean.json": {
     "preferred": "1.0.0",
     "versions": {
@@ -84,6 +92,14 @@
     "versions": {
       "1.0": {
         "swaggerUrl": "swagger-files/response-schemas.json"
+      }
+    }
+  },
+  "server-variables.json": {
+    "preferred": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "swaggerUrl": "swagger-files/server-variables.json"
       }
     }
   },
