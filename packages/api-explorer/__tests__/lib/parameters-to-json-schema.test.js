@@ -369,6 +369,28 @@ test('it should pass false value as default parameter', () => {
   ).toEqual({ default: false, type: 'boolean' });
 });
 
+test('it should display object type', () => {
+  expect(
+    parametersToJsonSchema({
+      parameters: [
+        {
+          in: 'query',
+          name: 'check',
+          schema: {
+            type: 'object',
+            properties: {
+              firstName: {
+                type: 'string',
+                title: 'First name',
+              },
+            },
+          },
+        },
+      ],
+    })[0].schema.properties.check,
+  ).toEqual({ properties: { firstName: { title: 'First name', type: 'string' } }, type: 'object' });
+});
+
 test('it should fetch $ref parameters', () => {
   const oas = {
     components: {

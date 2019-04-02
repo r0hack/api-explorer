@@ -54,6 +54,9 @@ function getOtherParams(pathOperation, oas) {
         if (current.schema.enum) schema.enum = current.schema.enum;
         if (current.schema.type) schema.type = current.schema.type;
         if (current.schema.format) schema.format = current.schema.format;
+        if (current.schema.type === 'object') {
+          schema.properties = current.schema.properties;
+        }
       }
 
       prev[current.name] = schema;
