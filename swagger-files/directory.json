@@ -7,22 +7,6 @@
       }
     }
   },
-  "all-of.json": {
-    "preferred": "1.0.0",
-    "versions": {
-      "1.0.0": {
-        "swaggerUrl": "swagger-files/all-of.json"
-      }
-    }
-  },
-  "any-of.json": {
-    "preferred": "1.0.0",
-    "versions": {
-      "1.0.0": {
-        "swaggerUrl": "swagger-files/any-of.json"
-      }
-    }
-  },
   "auth-types.json": {
     "preferred": "1.0.0",
     "versions": {
@@ -84,14 +68,6 @@
     "versions": {
       "1.0.0": {
         "swaggerUrl": "swagger-files/multiple-securities.json"
-      }
-    }
-  },
-  "one-of.json": {
-    "preferred": "1.0.0",
-    "versions": {
-      "1.0.0": {
-        "swaggerUrl": "swagger-files/one-of.json"
       }
     }
   },
