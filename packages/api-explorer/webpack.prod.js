@@ -5,11 +5,27 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const common = require('./webpack.config');
 
-module.exports = merge(common, {
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('production'),
-    }),
-    new UglifyJsPlugin(),
-  ],
-});
+module.exports = [
+  merge(common, {
+    output: {
+      filename: './dist/client.js',
+    },
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify('production'),
+      }),
+    ],
+    target: 'web',
+  }), 
+  merge(common, {
+    output: {
+      filename: './dist/server.js',
+    },
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify('production'),
+      }),
+    ],
+    target: 'node',
+  }),
+];
