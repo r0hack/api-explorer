@@ -87,6 +87,14 @@
       }
     }
   },
+  "multi-media-types.json": {
+    "preferred": "1.0",
+    "versions": {
+      "1.0": {
+        "swaggerUrl": "swagger-files/multi-media-types.json"
+      }
+    }
+  },
   "multiple-securities.json": {
     "preferred": "1.0.0",
     "versions": {
