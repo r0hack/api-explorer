@@ -143,14 +143,6 @@
       }
     }
   },
-  "totle.json": {
-    "preferred": "0.0.1",
-    "versions": {
-      "0.0.1": {
-        "swaggerUrl": "swagger-files/totle.json"
-      }
-    }
-  },
   "types.json": {
     "preferred": "1.0.0",
     "versions": {
