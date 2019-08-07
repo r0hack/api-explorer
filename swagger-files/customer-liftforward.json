@@ -1,0 +1,1589 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "https://app.asana.com/0/681252538274980/1134356552683766",
+    "description": "# Introduction\n  LiftForward Device as a Service (DRAFT) APIs are used by Merchants to integrate with LiftForward when offering device as a service programs.\n   # Testing\n  When testing on the sandbox environment (api.liftforward-sandbox.com) you can trigger expected responses such as APPROVE and DECLINE by submitting specific customer last names.\n  Below are the supported responses from the PreQualification and Application create APIs:\n  last_name    |response|\n  |------------|--------|\n  |decline     |DECLINED|\n  |locked      |FILE_SUPPRESSED|\n  |unavailable |FILE_UNAVAILABLE|\n  |ssn-mis     |SSN_MISMATCHED|\n  |addr-mis    |ADDRESS_MISMATCHED|\n  |all others  |APPROVED|\n  ----------------\n\n",
+    "contact": {
+      "name": "Drew Nichols",
+      "email": "drew@liftforward.com",
+      "url": "http://www.liftforward.com"
+    },
+    "version": "0.4.0"
+  },
+  "security": [
+    {
+      "api_key": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "pings",
+      "description": "Connectivity Tests"
+    },
+    {
+      "name": "merchant_customers",
+      "description": "MerchantCustomer endpoints"
+    },
+    {
+      "name": "pre_qualifications",
+      "description": "PreQualification endpoints"
+    },
+    {
+      "name": "applications",
+      "description": "Application endpoints"
+    },
+    {
+      "name": "payment_methods",
+      "description": "PaymentMethod endpoints"
+    },
+    {
+      "name": "orders",
+      "description": "Order endpoints"
+    },
+    {
+      "name": "charges",
+      "description": "Charge endpoints"
+    },
+    {
+      "name": "assets",
+      "description": "Asset endpoints"
+    },
+    {
+      "name": "returns",
+      "description": "Return endpoints"
+    },
+    {
+      "name": "jwks",
+      "description": "JSON Web Key endpoints"
+    }
+  ],
+  "paths": {
+    "/applications": {
+      "post": {
+        "summary": "Create",
+        "description": "Creates and submits a Device as a Service application for program and plan indicated by the plan_code.\n ## Decisions\n A 201 response can be interpreted as the request was accepted and a the api was able to render a decision. In the response payload's decision object the client application should inspect the decision_status, decision_reason_description and retry_allowed keys to determin next steps.\n |decision status|decision reason|retry allowed|Next Steps|\n|---------------|--------------------|-------------|---------|\n|APPROVED       |         n/a        |false        |The merchant should use the Accept api to signal that the customer has accpeted and wants to move forward and enroll.|\n|DECLINE        | FILE_SUPPRESSED    |false        |The customer's credit file was locked. The merchant should notify the customer and submit a new application once the customer has resolved the lock.|\n|DECLINE        | FILE_UNAVAILABLE   |false        |Customer's credit file could not be found. The merchant should notify the customer and submit a new application once the customer has reviewed and updated their information.|\n|DECLINE        | SSN_MISMATCHED     |true         |Customer's tax_id did not match the tax_id on file. The merchant should notify the customer and update the application via the Update api.|\n|DECLINE        | ADDRESS_MISMATCHED |true         |Customer's address did not match the address on file. The merchant should notify the customer and update the application via the Update api.|\n|DECLINE        | *all others*       |false        |Customer was declined because their credit profile was outside of program's credit policy. The next step for the merchant is to display a decline message to the customer.|\n|PENDING        | *all*              |false        |The application requires additional manual review. The merchant should display a pending message to the customer. Once the PENDING application is resolved LiftForward will notify the customer of the decision.|\n\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/postApplications"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Application submitted successfully. Check the decision.decision_status values to determine if the customer is approved for the provided program.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "405": {
+            "description": "Not Allowed"
+          },
+          "408": {
+            "description": "Request Time Out"
+          },
+          "500": {
+            "description": "Internal Service Error"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        },
+        "tags": [
+          "applications"
+        ],
+        "operationId": "postApplications"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "//api.liftforward-sandbox.com"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "description": "Api Key header issued by LiftForward.",
+        "name": "Api-Key",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "ApplicationRequest": {
+        "type": "object",
+        "properties": {
+          "pre_qualification_id": {
+            "type": "string",
+            "example": "s9n449h8x3hzkcmss2xeve4dy6h",
+            "description": "id of PreQualification"
+          },
+          "program_code": {
+            "type": "string",
+            "example": "program-abc",
+            "description": "String provided by LiftForward to identify the Device as a Service Program."
+          },
+          "merchant_customer_id": {
+            "type": "string",
+            "example": "twfexbh4erh4xq2g96c7ashfnjk",
+            "description": "Unique identifier for customer. Provided by the Merchant on create."
+          },
+          "merchant": {
+            "$ref": "#/components/schemas/MerchantEntity"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          }
+        },
+        "required": [
+          "program_code",
+          "merchant_customer_id",
+          "merchant",
+          "customer"
+        ]
+      },
+      "MerchantEntity": {
+        "type": "object",
+        "properties": {
+          "source_channel_id": {
+            "type": "string",
+            "example": "POS",
+            "enum": [
+              "POS",
+              "ONLINE"
+            ],
+            "description": "String to identify merchant's sales channel."
+          },
+          "store_id": {
+            "type": "string",
+            "example": "3028478594",
+            "description": "String to identify merchant's store. Required when source_channel_id = POS."
+          },
+          "employee_id": {
+            "type": "string",
+            "example": "39383473893939",
+            "description": "String to identify merchant's employee who assisted with sale. Required when source_channel_id = POS."
+          }
+        },
+        "required": [
+          "source_channel_id"
+        ]
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "ip_address": {
+            "type": "string",
+            "example": "123.45.67.123",
+            "description": "IP address v4 of the customer. Used for fraud checks in the Application. Optional for PreQualifications."
+          },
+          "personal_details": {
+            "$ref": "#/components/schemas/PersonalDetails"
+          },
+          "billing_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "shipping_address": {
+            "$ref": "#/components/schemas/Address"
+          }
+        },
+        "required": [
+          "personal_details",
+          "billing_address"
+        ]
+      },
+      "PersonalDetails": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "example": "Elliot",
+            "description": "First name of customer."
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Alderson",
+            "description": "Last name of customer."
+          },
+          "date_of_birth": {
+            "type": "string",
+            "format": "date",
+            "example": "1986-09-17",
+            "description": "Date of birth of customer. Format: YYYY-MM-DD"
+          },
+          "tax_id": {
+            "type": "string",
+            "example": "840324059",
+            "description": "Tax id (SSN) of customer. Format: NNNNNNNNN"
+          },
+          "email": {
+            "type": "string",
+            "example": "elliot.anderson@gmail.com",
+            "description": "email of customer."
+          },
+          "annual_income": {
+            "type": "integer",
+            "format": "int32",
+            "example": 130000,
+            "description": "Gross annual income of customer in dollars."
+          },
+          "home_phone_number": {
+            "type": "string",
+            "example": "8403240590",
+            "description": "Home phone number of customer. Format: NNNNNNNNNN. Required if mobile phone number not provided."
+          },
+          "mobile_phone_number": {
+            "type": "string",
+            "example": "8403240590",
+            "description": "Mobile phone number of customer. Format: NNNNNNNNNN. Required if home phone number not provided."
+          }
+        },
+        "required": [
+          "first_name",
+          "last_name",
+          "date_of_birth",
+          "tax_id",
+          "email",
+          "annual_income"
+        ]
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "address_line_1": {
+            "type": "string",
+            "example": "217 East Broadway",
+            "description": "Street address"
+          },
+          "address_line_2": {
+            "type": "string",
+            "example": "Apt. 4E",
+            "description": "Apt, Floor, Suite etc.. "
+          },
+          "city": {
+            "type": "string",
+            "example": "New York",
+            "description": "Address city."
+          },
+          "state_code": {
+            "type": "string",
+            "example": "NY",
+            "description": "2 letter US state code abbreviation."
+          },
+          "postal_code": {
+            "type": "string",
+            "example": "10002",
+            "description": "Address zip code. Format NNNNN or NNNNNNNNN."
+          },
+          "country_code": {
+            "type": "string",
+            "example": "US",
+            "description": "2 letter ISO-3166-1 country code."
+          }
+        },
+        "required": [
+          "address_line_1",
+          "city",
+          "state_code",
+          "postal_code",
+          "country_code"
+        ]
+      },
+      "postApplications": {
+        "type": "object",
+        "properties": {
+          "application": {
+            "$ref": "#/components/schemas/ApplicationRequest"
+          }
+        },
+        "required": [
+          "application"
+        ],
+        "description": "Create"
+      },
+      "ApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "application": {
+            "$ref": "#/components/schemas/ApplicationEntity"
+          }
+        },
+        "required": [
+          "application"
+        ],
+        "description": "Creates and submits a Device as a Service application for program and plan indicated by the plan_code.\n ## Decisions\n A 201 response can be interpreted as the request was accepted and a the api was able to render a decision. In the response payload's decision object the client application should inspect the decision_status, decision_reason_description and retry_allowed keys to determin next steps.\n |decision status|decision reason|retry allowed|Next Steps|\n|---------------|--------------------|-------------|---------|\n|APPROVED       |         n/a        |false        |The merchant should use the Accept api to signal that the customer has accpeted and wants to move forward and enroll.|\n|DECLINE        | FILE_SUPPRESSED    |false        |The customer's credit file was locked. The merchant should notify the customer and submit a new application once the customer has resolved the lock.|\n|DECLINE        | FILE_UNAVAILABLE   |false        |Customer's credit file could not be found. The merchant should notify the customer and submit a new application once the customer has reviewed and updated their information.|\n|DECLINE        | SSN_MISMATCHED     |true         |Customer's tax_id did not match the tax_id on file. The merchant should notify the customer and update the application via the Update api.|\n|DECLINE        | ADDRESS_MISMATCHED |true         |Customer's address did not match the address on file. The merchant should notify the customer and update the application via the Update api.|\n|DECLINE        | *all others*       |false        |Customer was declined because their credit profile was outside of program's credit policy. The next step for the merchant is to display a decline message to the customer.|\n|PENDING        | *all*              |false        |The application requires additional manual review. The merchant should display a pending message to the customer. Once the PENDING application is resolved LiftForward will notify the customer of the decision.|\n\n"
+      },
+      "ApplicationEntity": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string",
+            "example": "r9dwagzgmjk2jxfqxtesnsccerh",
+            "description": "id of Application"
+          },
+          "pre_qualification_id": {
+            "type": "string",
+            "example": "s9n449h8x3hzkcmss2xeve4dy6h",
+            "description": "id of PreQualification"
+          },
+          "program_code": {
+            "type": "string",
+            "example": "program-abc",
+            "description": "String provided by LiftForward to identify the Device as a Service Program."
+          },
+          "merchant_customer_id": {
+            "type": "string",
+            "example": "twfexbh4erh4xq2g96c7ashfnjk",
+            "description": "Unique identifier for customer. Provided by the Merchant on create."
+          },
+          "expires_at": {
+            "type": "string",
+            "example": "2019-07-31T14:32:21Z",
+            "description": "Time in iso8601 UTC when PreQualification will expire."
+          },
+          "merchant": {
+            "$ref": "#/components/schemas/MerchantEntity"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "agreements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Agreement"
+            },
+            "description": "Array of agreements customer must agree to for the current program."
+          }
+        },
+        "required": [
+          "program_code",
+          "merchant_customer_id"
+        ]
+      },
+      "Decision": {
+        "type": "object",
+        "properties": {
+          "fraud_alert_flag": {
+            "type": "boolean",
+            "description": "Fraud Alert Flag. True if application is suspected to be fraud."
+          },
+          "decision_status": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "DECLINED",
+              "CANCELED"
+            ],
+            "description": "Status of decision."
+          },
+          "decision_reason_code": {
+            "type": "string",
+            "description": "Code for the reason for the decision. Only populated in a decline or error scenario."
+          },
+          "decision_reason_description": {
+            "type": "string",
+            "description": "Description of the decision reason code. Only populated in a decline or error scenario."
+          }
+        }
+      },
+      "Agreement": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "electronic-signature-consent",
+            "description": "Name of agreement customer is agreeing to."
+          },
+          "version": {
+            "type": "string",
+            "example": "1.0.2",
+            "description": "Version number of the agreement."
+          },
+          "customer_agreed_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-07-31T14:32:21Z",
+            "description": "Timestamp of applicant consenting in ISO-8601 UTC format."
+          }
+        },
+        "required": [
+          "name",
+          "version",
+          "customer_agreed_at"
+        ]
+      },
+      "ApplicationAcceptRequest": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string",
+            "example": "r9dwagzgmjk2jxfqxtesnsccerh",
+            "description": "id of Application"
+          },
+          "merchant_customer_id": {
+            "type": "string",
+            "example": "twfexbh4erh4xq2g96c7ashfnjk",
+            "description": "Unique identifier for customer. Provided by the Merchant on create."
+          },
+          "customer_validation": {
+            "$ref": "#/components/schemas/CustomerValidation"
+          },
+          "agreements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Agreement"
+            },
+            "description": "Array of agreements customer must agree to for the current program. These are supplied in the create application response."
+          }
+        },
+        "required": [
+          "merchant_customer_id",
+          "customer_validation"
+        ]
+      },
+      "CustomerValidation": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "example": "Elliot",
+            "description": "First name of customer."
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Alderson",
+            "description": "Last name of customer."
+          },
+          "date_of_birth": {
+            "type": "string",
+            "format": "date",
+            "example": "1986-09-17",
+            "description": "Date of birth of customer. Format: YYYY-MM-DD"
+          },
+          "tax_id": {
+            "type": "string",
+            "example": "4059",
+            "description": "Last 4 digits of customer Tax ID. Format: NNNN"
+          }
+        },
+        "required": [
+          "first_name",
+          "last_name",
+          "date_of_birth",
+          "tax_id"
+        ]
+      },
+      "putApplicationsAccept": {
+        "type": "object",
+        "properties": {
+          "application_accept": {
+            "$ref": "#/components/schemas/ApplicationAcceptRequest"
+          }
+        },
+        "required": [
+          "application_accept"
+        ],
+        "description": "Accept"
+      },
+      "ApplicationAcceptResponse": {
+        "type": "object",
+        "properties": {
+          "application_accept": {
+            "$ref": "#/components/schemas/ApplicationAcceptEntity"
+          },
+          "approval": {
+            "$ref": "#/components/schemas/ApprovalResponse"
+          }
+        },
+        "description": "Triggers acceptance of an existing application. Can only be called once on an approved application. Must be called after the approval in order to confirm the customer has agreed to the program terms and wants to enroll.\n After calling, multiple downstream asynchronsous events will kick off to open an line of credit for the customer and setup various account. If not called within a limited number of days the application will be automatically canceled.\n"
+      },
+      "ApplicationAcceptEntity": {
+        "type": "object",
+        "properties": {
+          "application_accept_id": {
+            "type": "string",
+            "example": "bddqym6x4havc3jvphvr3ask8s5",
+            "description": "id of ApplicationAccept"
+          },
+          "application_id": {
+            "type": "string",
+            "example": "r9dwagzgmjk2jxfqxtesnsccerh",
+            "description": "id of Application"
+          },
+          "merchant_customer_id": {
+            "type": "string",
+            "example": "twfexbh4erh4xq2g96c7ashfnjk",
+            "description": "Unique identifier for customer. Provided by the Merchant on create."
+          }
+        },
+        "required": [
+          "merchant_customer_id"
+        ]
+      },
+      "ApprovalResponse": {
+        "type": "object",
+        "properties": {
+          "approval_token": {
+            "type": "string",
+            "example": "42rpb35nad32a8c5t9dbdgcqe5w",
+            "description": "Token which is used to create Orders and PaymentMethods."
+          },
+          "expires_at": {
+            "type": "string",
+            "example": "2019-07-31T14:32:21Z",
+            "description": ""
+          }
+        },
+        "required": [
+          "approval_token",
+          "expires_at"
+        ]
+      },
+      "AssetRequest": {
+        "type": "object",
+        "properties": {
+          "program_code": {
+            "type": "string",
+            "example": "program-abc",
+            "description": "String provided by LiftForward to identify the Device as a Service Program."
+          },
+          "reference_id": {
+            "type": "string",
+            "example": "1234567890ABCDEFGHIJ",
+            "description": "Merchant defined ID for mapping this item back to an external source."
+          },
+          "reference_id_source": {
+            "type": "string",
+            "example": "liftforward",
+            "description": "Name of the source of the Merchant defined reference ID."
+          },
+          "merchant_sku": {
+            "type": "string",
+            "example": "30-X9383-94",
+            "description": "Merchant defined SKU for this item."
+          },
+          "product_id": {
+            "type": "string",
+            "example": "product_123",
+            "description": "LiftForward provided identifier for this item, if available."
+          },
+          "serial_number": {
+            "type": "string",
+            "example": "803394475952",
+            "description": "Serial number for the device indicated by the product_id and sku."
+          }
+        },
+        "required": [
+          "program_code",
+          "reference_id",
+          "reference_id_source",
+          "merchant_sku",
+          "product_id",
+          "serial_number"
+        ]
+      },
+      "postAssets": {
+        "type": "object",
+        "properties": {
+          "asset": {
+            "$ref": "#/components/schemas/AssetRequest"
+          }
+        },
+        "required": [
+          "asset"
+        ],
+        "description": "Create"
+      },
+      "AssetResponse": {
+        "type": "object",
+        "properties": {
+          "asset": {
+            "$ref": "#/components/schemas/AssetEntity"
+          }
+        },
+        "description": "Creates assets for a specific order.\n"
+      },
+      "AssetEntity": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "example": "4p3k959ghbvn2km3amv8z54v4xh",
+            "description": "Unique identifier for this asset."
+          },
+          "program_code": {
+            "type": "string",
+            "example": "program-abc",
+            "description": "String provided by LiftForward to identify the Device as a Service Program."
+          },
+          "reference_id": {
+            "type": "string",
+            "example": "1234567890ABCDEFGHIJ",
+            "description": "Merchant defined ID for mapping this item back to an external source."
+          },
+          "reference_id_source": {
+            "type": "string",
+            "example": "liftforward",
+            "description": "Name of the source of the Merchant defined reference ID."
+          },
+          "merchant_sku": {
+            "type": "string",
+            "example": "30-X9383-94",
+            "description": "Merchant defined SKU for this item."
+          },
+          "product_id": {
+            "type": "string",
+            "example": "product_123",
+            "description": "LiftForward provided identifier for this item, if available."
+          },
+          "serial_number": {
+            "type": "string",
+            "example": "803394475952",
+            "description": "Serial number for the device indicated by the product_id and sku."
+          }
+        },
+        "required": [
+          "program_code",
+          "reference_id",
+          "reference_id_source",
+          "merchant_sku",
+          "product_id",
+          "serial_number"
+        ]
+      },
+      "ChargeRequest": {
+        "type": "object",
+        "properties": {
+          "payment_token": {
+            "type": "string",
+            "example": "352z57r8bj75ygfszpt99ap76t2",
+            "description": "payment_token used the create this charge."
+          },
+          "amount": {
+            "type": "number",
+            "format": "float",
+            "example": 967.69,
+            "description": "Amount to be charged."
+          },
+          "auto_capture": {
+            "type": "boolean",
+            "description": "Indicates if the charge should be captured immediately."
+          }
+        },
+        "required": [
+          "payment_token",
+          "amount"
+        ]
+      },
+      "postCharges": {
+        "type": "object",
+        "properties": {
+          "charge": {
+            "$ref": "#/components/schemas/ChargeRequest"
+          }
+        },
+        "required": [
+          "charge"
+        ],
+        "description": "Create"
+      },
+      "ChargeResponse": {
+        "type": "object",
+        "properties": {
+          "charge": {
+            "$ref": "#/components/schemas/ChargeEntity"
+          }
+        },
+        "description": "Captures a Charge.\n"
+      },
+      "ChargeEntity": {
+        "type": "object",
+        "properties": {
+          "charge_id": {
+            "type": "string",
+            "example": "fhgjrz6czvwamwqy5qjr66gd425",
+            "description": "Unique identifier for this charge."
+          },
+          "payment_token": {
+            "type": "string",
+            "example": "352z57r8bj75ygfszpt99ap76t2",
+            "description": "payment_token used the create this charge."
+          },
+          "amount": {
+            "type": "number",
+            "format": "float",
+            "example": 967.69,
+            "description": "Amount to be charged."
+          },
+          "auto_capture": {
+            "type": "boolean",
+            "description": "Indicates if the charge should be captured immediately."
+          },
+          "status": {
+            "type": "string",
+            "example": "authorized",
+            "enum": [
+              "authorized",
+              "captured"
+            ],
+            "description": "Current status of the charge"
+          },
+          "expires_at": {
+            "type": "string",
+            "example": "2019-07-31T14:32:21Z",
+            "description": "Time in iso8601 UTC when charge will expire."
+          }
+        },
+        "required": [
+          "payment_token",
+          "amount"
+        ]
+      },
+      "CaptureCharge": {
+        "type": "object",
+        "properties": {
+          "charge_id": {
+            "type": "string",
+            "example": "fhgjrz6czvwamwqy5qjr66gd425",
+            "description": "Unique identifier for this charge."
+          }
+        }
+      },
+      "putChargesCapture": {
+        "type": "object",
+        "properties": {
+          "charge": {
+            "$ref": "#/components/schemas/CaptureCharge"
+          }
+        },
+        "required": [
+          "charge"
+        ],
+        "description": "Capture"
+      },
+      "MerchantCustomerEntity": {
+        "type": "object",
+        "properties": {
+          "merchant_customer_id": {
+            "type": "string",
+            "example": "twfexbh4erh4xq2g96c7ashfnjk",
+            "description": "Unique identifier for customer. Provided by the Merchant on create."
+          }
+        },
+        "required": [
+          "merchant_customer_id"
+        ]
+      },
+      "postMerchantCustomer": {
+        "type": "object",
+        "properties": {
+          "merchant_customer": {
+            "$ref": "#/components/schemas/MerchantCustomerEntity"
+          }
+        },
+        "required": [
+          "merchant_customer"
+        ],
+        "description": "Create"
+      },
+      "MerchantCustomerResponse": {
+        "type": "object",
+        "properties": {
+          "merchant_customer": {
+            "$ref": "#/components/schemas/MerchantCustomerEntity"
+          }
+        },
+        "description": "Shows the MerchantCustomer associated with the provided `merchant_customer_id`.\n"
+      },
+      "OrderRequest": {
+        "type": "object",
+        "properties": {
+          "merchant_customer_id": {
+            "type": "string",
+            "example": "twfexbh4erh4xq2g96c7ashfnjk",
+            "description": "Unique identifier for customer. Provided by the Merchant on create."
+          },
+          "approval_token": {
+            "type": "string",
+            "example": "njhm4rvmr3d3yy3zntgjw6xtfpy",
+            "description": "Token which is used to create Orders and PaymentMethods."
+          },
+          "merchant_order_id": {
+            "type": "string",
+            "example": "z78xbj5p777qprqbjtkpqmkk659",
+            "description": "Unique identifier used by merchant for this order."
+          },
+          "plan_code": {
+            "type": "string",
+            "example": "plan-abc-24",
+            "description": "String provided by LiftForward to identify the Device as a Service Plan."
+          },
+          "program_code": {
+            "type": "string",
+            "example": "program-abc",
+            "description": "String provided by LiftForward to identify the Device as a Service Program."
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "elliot.anderson@gmail.com",
+            "description": "Email address for customer who owns this order."
+          },
+          "billing_address": {
+            "$ref": "#/components/schemas/OrderAddress"
+          },
+          "shipping_address": {
+            "$ref": "#/components/schemas/OrderAddress"
+          },
+          "merchant_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemEntity"
+            },
+            "description": "Array of OrderItems describing the merchant items in this order."
+          }
+        },
+        "required": [
+          "merchant_customer_id",
+          "approval_token",
+          "merchant_order_id",
+          "program_code",
+          "merchant_items"
+        ]
+      },
+      "OrderAddress": {
+        "type": "object",
+        "properties": {
+          "address_line_1": {
+            "type": "string",
+            "example": "217 East Broadway",
+            "description": "Street address"
+          },
+          "address_line_2": {
+            "type": "string",
+            "example": "Apt. 4E",
+            "description": "Apt, Floor, Suite etc.. "
+          },
+          "city": {
+            "type": "string",
+            "example": "New York",
+            "description": "Address city."
+          },
+          "state_code": {
+            "type": "string",
+            "example": "NY",
+            "description": "2 letter US state code abbreviation."
+          },
+          "postal_code": {
+            "type": "string",
+            "example": "10002",
+            "description": "Address zip code. Format NNNNN or NNNNNNNNN."
+          },
+          "country_code": {
+            "type": "string",
+            "example": "US",
+            "description": "2 letter ISO-3166-1 country code."
+          },
+          "first_name": {
+            "type": "string",
+            "example": "Elliot",
+            "description": "First name of customer."
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Alderson",
+            "description": "Last name of customer."
+          }
+        },
+        "required": [
+          "address_line_1",
+          "city",
+          "state_code",
+          "postal_code",
+          "country_code",
+          "first_name",
+          "last_name"
+        ]
+      },
+      "OrderItemEntity": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "Product 123",
+            "description": "Short description of the product represented by this line item."
+          },
+          "sku": {
+            "type": "string",
+            "example": "30-X9383-94",
+            "description": "Merchant defined SKU for this item."
+          },
+          "product_id": {
+            "type": "string",
+            "example": "product_123",
+            "description": "LiftForward provided identifier for this item, if available."
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1,
+            "description": "Quantity of items purchased."
+          },
+          "unit_retail_price": {
+            "type": "number",
+            "format": "float",
+            "example": 299.99,
+            "description": "Unit retail price for the item before any discount."
+          },
+          "unit_sale_price": {
+            "type": "number",
+            "format": "float",
+            "example": 299.99,
+            "description": "Unit price the item was sold for including any discount."
+          },
+          "retail_price": {
+            "type": "number",
+            "format": "float",
+            "example": 299.99,
+            "description": "Retail price for the line item before any discount. (unit_retail_price * quantity)"
+          },
+          "sale_price": {
+            "type": "number",
+            "format": "float",
+            "example": 299.99,
+            "description": "Price this line item was sole for including any discount. (unit_sale_price * quantity)"
+          },
+          "shipping_fee": {
+            "type": "number",
+            "format": "float",
+            "default": 0,
+            "example": 25.39,
+            "description": "Shipping fee for this line item."
+          },
+          "sales_tax": {
+            "type": "number",
+            "format": "float",
+            "default": 0,
+            "example": 26.25,
+            "description": "Sales tax for this line item."
+          },
+          "misc_fees": {
+            "type": "number",
+            "format": "float",
+            "default": 0,
+            "example": 5,
+            "description": "Miscellaneous fees for this line item."
+          }
+        },
+        "required": [
+          "description",
+          "sku",
+          "product_id",
+          "quantity",
+          "unit_retail_price",
+          "unit_sale_price"
+        ]
+      },
+      "postOrders": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderRequest"
+          }
+        },
+        "required": [
+          "order"
+        ],
+        "description": "Create"
+      },
+      "OrderResponse": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderEntity"
+          }
+        },
+        "description": "Place"
+      },
+      "OrderEntity": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "example": "b9j2e59zmxgmcvytztw6p8tm298",
+            "description": "Unique identifier for this Order."
+          },
+          "merchant_customer_id": {
+            "type": "string",
+            "example": "twfexbh4erh4xq2g96c7ashfnjk",
+            "description": "Unique identifier for customer. Provided by the Merchant on create."
+          },
+          "approval_token": {
+            "type": "string",
+            "example": "njhm4rvmr3d3yy3zntgjw6xtfpy",
+            "description": "Token which is used to create Orders and PaymentMethods."
+          },
+          "payment_method_id": {
+            "type": "string",
+            "example": "vzfrna9j58cm3eccsxfbhnvj6jk",
+            "description": "Unique identifier for the associated PaymentMethod."
+          },
+          "merchant_order_id": {
+            "type": "string",
+            "example": "z78xbj5p777qprqbjtkpqmkk659",
+            "description": "Unique identifier used by merchant for this order."
+          },
+          "plan_code": {
+            "type": "string",
+            "example": "plan-abc-24",
+            "description": "String provided by LiftForward to identify the Device as a Service Plan."
+          },
+          "program_code": {
+            "type": "string",
+            "example": "program-abc",
+            "description": "String provided by LiftForward to identify the Device as a Service Program."
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "elliot.anderson@gmail.com",
+            "description": "Email address for customer who owns this order."
+          },
+          "status": {
+            "type": "string",
+            "example": "open",
+            "description": "Current status of the orders. open, placed, canceled"
+          },
+          "total_sale_price": {
+            "type": "number",
+            "format": "float",
+            "example": 1200,
+            "description": "Total cash value of merchandise specified in the items array."
+          },
+          "total_sales_tax": {
+            "type": "number",
+            "format": "float",
+            "example": 106.5,
+            "description": "Total sales tax for this order."
+          },
+          "total_shipping_fee": {
+            "type": "number",
+            "format": "float",
+            "example": 59.99,
+            "description": "Total shipping fee for this order."
+          },
+          "total_misc_fees": {
+            "type": "number",
+            "format": "float",
+            "example": 0,
+            "description": "Total miscellaneous fees for this order."
+          },
+          "total_price": {
+            "type": "number",
+            "format": "float",
+            "example": 1366.49,
+            "description": "Total amount to be financed for this order. Should equal sum of total_sale_price, total_sales_tax, total_shipping_fee and total_misc_fees."
+          },
+          "total_monthly_payment": {
+            "type": "number",
+            "format": "float",
+            "example": 56.94,
+            "description": "Total amount of the monthly payment for this order order."
+          },
+          "billing_address": {
+            "$ref": "#/components/schemas/OrderAddress"
+          },
+          "shipping_address": {
+            "$ref": "#/components/schemas/OrderAddress"
+          },
+          "merchant_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemEntity"
+            },
+            "description": "Array of OrderItems describing the merchant items in this order."
+          },
+          "plan_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemEntity"
+            },
+            "description": "Array of OrderItems describing the plan items in this order."
+          }
+        },
+        "required": [
+          "merchant_customer_id",
+          "approval_token",
+          "merchant_order_id",
+          "program_code",
+          "total_sale_price",
+          "total_sales_tax",
+          "total_shipping_fee",
+          "total_misc_fees",
+          "total_price",
+          "total_monthly_payment",
+          "merchant_items",
+          "plan_items"
+        ]
+      },
+      "OrderPlace": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "example": "9engxvhrkcm4g59g7krbtashms3",
+            "description": "Unique identifier for this Order."
+          },
+          "payment_method_id": {
+            "type": "string",
+            "example": "gvqy6s7rcdev39epmcsac3bg45t",
+            "description": "Unique identifier for the associated PaymentMethod."
+          }
+        }
+      },
+      "putOrdersPlace": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderPlace"
+          }
+        },
+        "required": [
+          "order"
+        ],
+        "description": "Place"
+      },
+      "PaymentMethodRequest": {
+        "type": "object",
+        "properties": {
+          "merchant_customer_id": {
+            "type": "string",
+            "example": "twfexbh4erh4xq2g96c7ashfnjk",
+            "description": "Unique identifier for customer. Provided by the Merchant on create."
+          },
+          "approval_token": {
+            "type": "string",
+            "example": "ky2jkvd3t6a4dyvnmnxp3a3evaf",
+            "description": "Token which is used to create Orders and PaymentMethods."
+          },
+          "payment_method_type": {
+            "type": "string",
+            "example": "card",
+            "enum": [
+              "token",
+              "card"
+            ],
+            "description": "Type of PaymentMethod to create"
+          }
+        },
+        "required": [
+          "merchant_customer_id",
+          "approval_token",
+          "payment_method_type"
+        ]
+      },
+      "postPaymentMethods": {
+        "type": "object",
+        "properties": {
+          "payment_method": {
+            "$ref": "#/components/schemas/PaymentMethodRequest"
+          }
+        },
+        "required": [
+          "payment_method"
+        ],
+        "description": "Create"
+      },
+      "PaymentMethodResponse": {
+        "type": "object",
+        "properties": {
+          "payment_method": {
+            "$ref": "#/components/schemas/PaymentMethodEntity"
+          }
+        },
+        "required": [
+          "payment_method"
+        ],
+        "description": "Creates a PaymentMethod.\n"
+      },
+      "PaymentMethodEntity": {
+        "type": "object",
+        "properties": {
+          "payment_method_id": {
+            "type": "string",
+            "example": "358bkkbdr2d32m9hezmf5s4kad9",
+            "description": "Unique identifier for PaymentMethod."
+          },
+          "merchant_customer_id": {
+            "type": "string",
+            "example": "twfexbh4erh4xq2g96c7ashfnjk",
+            "description": "Unique identifier for customer. Provided by the Merchant on create."
+          },
+          "approval_token": {
+            "type": "string",
+            "example": "ky2jkvd3t6a4dyvnmnxp3a3evaf",
+            "description": "Token which is used to create Orders and PaymentMethods."
+          },
+          "payment_method_type": {
+            "type": "string",
+            "example": "card",
+            "enum": [
+              "token",
+              "card"
+            ],
+            "description": "Type of PaymentMethod to create"
+          },
+          "payment_token": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "string",
+            "example": "2019-07-31T14:32:21Z",
+            "description": "Time in iso8601 UTC when PaymentMethod will expire."
+          },
+          "card": {
+            "$ref": "#/components/schemas/CreditCardEntity"
+          }
+        },
+        "required": [
+          "merchant_customer_id",
+          "approval_token",
+          "payment_method_type"
+        ]
+      },
+      "CreditCardEntity": {
+        "type": "object",
+        "properties": {
+          "pan": {
+            "type": "string",
+            "example": "3940029284830043",
+            "description": "16 Digit pan for card."
+          },
+          "exp": {
+            "type": "string",
+            "example": "0323",
+            "description": "Expiration for card in MMYY format."
+          },
+          "cvv": {
+            "type": "string",
+            "example": "123",
+            "description": "CVV number for card."
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pan",
+          "exp",
+          "cvv"
+        ]
+      },
+      "postPings": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "id of ping.",
+            "default": "123"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "description": "A simple POST style operation allowing developers to verify connectivity and authentication."
+      },
+      "PreQualificationCreate": {
+        "type": "object",
+        "properties": {
+          "program_code": {
+            "type": "string",
+            "example": "program-abc",
+            "description": "String provided by LiftForward to identify the Device as a Service Program."
+          },
+          "merchant_customer_id": {
+            "type": "string",
+            "example": "twfexbh4erh4xq2g96c7ashfnjk",
+            "description": "Unique identifier for customer. Provided by the Merchant on create."
+          },
+          "merchant": {
+            "$ref": "#/components/schemas/MerchantEntity"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          }
+        },
+        "required": [
+          "program_code",
+          "merchant_customer_id",
+          "merchant",
+          "customer"
+        ]
+      },
+      "postPreQualifications": {
+        "type": "object",
+        "properties": {
+          "pre_qualification": {
+            "$ref": "#/components/schemas/PreQualificationCreate"
+          }
+        },
+        "required": [
+          "pre_qualification"
+        ],
+        "description": "Create"
+      },
+      "PreQualificationResponse": {
+        "type": "object",
+        "properties": {
+          "pre_qualification": {
+            "$ref": "#/components/schemas/PreQualificationEntity"
+          }
+        },
+        "required": [
+          "pre_qualification"
+        ],
+        "description": "Creates and submits a Device as a Service pre-qualification for program and plan indicated by the plan_code.\n\n## Decisions\n\nA 201 response can be interpreted as the request was accepted and a the api was able to render a decision. In the response payload's decision object the client application should inspect the decision_status and decision_reason_description keys to determine next steps.\n\n|decision status|decision reason|Next Steps|\n|---------------|--------------------|----------|\n|APPROVED       |         n/a        |The merchant should use the Application api to submit a full application.|\n|DECLINE        | FILE_SUPPRESSED    |The customer's credit file was locked. The merchant should notify the customer and submit a new pre-qualification once the customer has resolved the lock.|\n|DECLINE        | FILE_UNAVAILABLE   |Customer's credit file could not be found. The merchant should notify the customer and submit a new pre-qualification once the customer has reviewed and updated their information.|\n|DECLINE        | *all others*       |Customer was declined because their credit profile was outside of program's credit policy. The next step for the merchant is to display a decline message to the customer.|\n\n"
+      },
+      "PreQualificationEntity": {
+        "type": "object",
+        "properties": {
+          "pre_qualification_id": {
+            "type": "string",
+            "example": "s9n449h8x3hzkcmss2xeve4dy6h",
+            "description": "id of PreQualification"
+          },
+          "program_code": {
+            "type": "string",
+            "example": "program-abc",
+            "description": "String provided by LiftForward to identify the Device as a Service Program."
+          },
+          "merchant_customer_id": {
+            "type": "string",
+            "example": "twfexbh4erh4xq2g96c7ashfnjk",
+            "description": "Unique identifier for customer. Provided by the Merchant on create."
+          },
+          "expires_at": {
+            "type": "string",
+            "example": "2019-07-31T14:32:21Z",
+            "description": "Time in iso8601 UTC when PreQualification will expire."
+          },
+          "merchant": {
+            "$ref": "#/components/schemas/MerchantEntity"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          }
+        },
+        "required": [
+          "pre_qualification_id",
+          "program_code",
+          "merchant_customer_id"
+        ]
+      },
+      "PlanEntity": {
+        "type": "object",
+        "properties": {
+          "plan_code": {
+            "type": "string",
+            "example": "plan-abc-24",
+            "description": "String provided by LiftForward to identify the Device as a Service Plan."
+          }
+        },
+        "required": [
+          "plan_code"
+        ]
+      },
+      "PreQualificationRequest": {
+        "type": "object",
+        "properties": {
+          "pre_qualification": {
+            "$ref": "#/components/schemas/PreQualificationCreate"
+          }
+        },
+        "required": [
+          "pre_qualification"
+        ]
+      },
+      "ReturnRequest": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string",
+            "example": "qt5fc9xztgsxwb",
+            "description": "id of Application."
+          },
+          "merchant": {
+            "$ref": "#/components/schemas/MerchantEntity"
+          },
+          "order": {
+            "$ref": "#/components/schemas/ReturnOrder"
+          }
+        },
+        "required": [
+          "application_id",
+          "merchant",
+          "order"
+        ]
+      },
+      "ReturnOrder": {
+        "type": "object",
+        "properties": {
+          "merchant_order_id": {
+            "type": "string",
+            "example": "rxrnpazhbjfd4a",
+            "description": "Unique identifier used by merchant for this order."
+          },
+          "total_sale_price": {
+            "type": "number",
+            "format": "float",
+            "example": 1200,
+            "description": "Total cash value of merchandise specified in the items array."
+          },
+          "total_sales_tax": {
+            "type": "number",
+            "format": "float",
+            "example": 106.5,
+            "description": "Total sales tax for this order."
+          },
+          "total_shipping_fee": {
+            "type": "number",
+            "format": "float",
+            "example": 59.99,
+            "description": "Total shipping fee for this order."
+          },
+          "total_misc_fees": {
+            "type": "number",
+            "format": "float",
+            "example": 0,
+            "description": "Total miscellaneous fees for this order."
+          },
+          "total_price": {
+            "type": "number",
+            "format": "float",
+            "example": 1366.49,
+            "description": "Total amount to be financed for this order. Should equal sum of total_sale_price, total_sales_tax, total_shipping_fee and total_misc_fees."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReturnOrderItem"
+            },
+            "description": "Array of OrderItems describing the items in this order."
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "ReturnOrderItem": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "Xbox All Access - Minecraft Edition - Xbox S",
+            "description": "Short description of the product represented by this line item."
+          },
+          "merchant_sku": {
+            "type": "string",
+            "example": "30-X9383-94",
+            "description": "Merchant defined SKU for this item."
+          },
+          "product_id": {
+            "type": "string",
+            "example": "3c73d86f0f8ce1a18fef7e1f13cf6256",
+            "description": "Globally Unique identifier for this item, if available."
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1,
+            "description": "Quantity of items purchased."
+          },
+          "unit_sale_price": {
+            "type": "number",
+            "format": "float",
+            "example": 1200,
+            "description": "Unit price for this item."
+          },
+          "serial_numbers": {
+            "type": "string",
+            "example": [
+              "393487583020283849"
+            ],
+            "description": "Array of strings containing serial numbers for the devices. Size of array should match quantity."
+          }
+        },
+        "required": [
+          "merchant_sku",
+          "quantity"
+        ]
+      },
+      "ReturnResponse": {
+        "type": "object",
+        "properties": {
+          "return_id": {
+            "type": "string",
+            "example": "smryvsxs4nnahz",
+            "description": "id of Return"
+          },
+          "application_id": {
+            "type": "string",
+            "example": "fq3jg5jk3aymjv",
+            "description": "id of Application"
+          },
+          "merchant": {
+            "$ref": "#/components/schemas/MerchantEntity"
+          },
+          "return_decision": {
+            "$ref": "#/components/schemas/ReturnDecision"
+          }
+        }
+      },
+      "ReturnDecision": {
+        "type": "object",
+        "properties": {
+          "decision_status": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "DECLINED"
+            ],
+            "description": "Status of decision."
+          },
+          "decision_reason_description": {
+            "type": "string",
+            "enum": [
+              "ALREADY_RETURNED",
+              "APPLICATION_NOT_ACCEPTED"
+            ],
+            "description": "Description of the decision reason code. Only populated in a decline scenario."
+          }
+        }
+      }
+    }
+  },
+  "x-explorer-enabled": true,
+  "x-proxy-enabled": true,
+  "x-samples-enabled": true,
+  "x-samples-languages": [
+    "curl",
+    "node",
+    "ruby",
+    "javascript",
+    "python"
+  ]
+}

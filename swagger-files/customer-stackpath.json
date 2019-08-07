@@ -1,0 +1,1495 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Edge Compute",
+    "version": "1.0"
+  },
+  "paths": {
+    "\/workload\/v1\/stacks\/{stack_id}\/workloads": {
+      "post": {
+        "summary": "Create a new workload",
+        "operationId": "CreateWorkload",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "$ref": "#\/components\/schemas\/v1CreateWorkloadResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Returned when an unauthorized request is attempted.",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "$ref": "#\/components\/schemas\/stackpathapiStatus"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "$ref": "#\/components\/schemas\/stackpathapiStatus"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Default error structure.",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "$ref": "#\/components\/schemas\/stackpathapiStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "stack_id",
+            "description": "The ID of the stack to create the workload in",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "Workloads"
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "$ref": "#\/components\/schemas\/v1CreateWorkloadRequest"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "OAuth2": [
+
+      ]
+    }
+  ],
+  "externalDocs": {
+    "description": "SP\/\/ Developer Portal",
+    "url": "https:\/\/developer.stackpath.com\/"
+  },
+  "servers": [
+    {
+      "url": "https:\/\/gateway.stackpath.com\/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https:\/\/gateway.stackpath.com\/identity\/v1\/oauth2\/token",
+            "scopes": {
+
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ContainerStatusRunning": {
+        "type": "object",
+        "properties": {
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "The date a container started"
+          }
+        },
+        "title": "Properties related to running containers"
+      },
+      "ContainerStatusTerminated": {
+        "type": "object",
+        "properties": {
+          "exitCode": {
+            "type": "integer",
+            "format": "int32",
+            "title": "The exit code of the command that started the container"
+          },
+          "reason": {
+            "type": "string",
+            "title": "The reason a container terminated"
+          },
+          "message": {
+            "type": "string",
+            "title": "A more detailed explanation of a container's termination"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "The date a container started"
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "The date a container terminated"
+          }
+        },
+        "title": "Properties related to terminated containers"
+      },
+      "ContainerStatusWaiting": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "title": "The reason that a container is waiting to start"
+          },
+          "message": {
+            "type": "string",
+            "title": "A more detailed explanation of a container's waiting state"
+          }
+        },
+        "title": "Properties related to containers that are starting up"
+      },
+      "DataMatrix": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/DataMatrixResult"
+            },
+            "title": "A data point's value"
+          }
+        },
+        "title": "A set of time series containing a range of data points over time for each time series"
+      },
+      "DataMatrixResult": {
+        "type": "object",
+        "properties": {
+          "metric": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "The data points' labels"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/DataValue"
+            },
+            "title": "Time series data point values"
+          }
+        },
+        "title": "Time series containing a range of data points over time for each time series"
+      },
+      "DataValue": {
+        "type": "object",
+        "properties": {
+          "unixTime": {
+            "type": "string",
+            "title": "The time that a data point was recorded"
+          },
+          "value": {
+            "type": "string",
+            "title": "A data point's value"
+          }
+        },
+        "title": "An individual metric data point"
+      },
+      "DataVector": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/DataVectorResult"
+            },
+            "title": "A data point's value"
+          }
+        },
+        "title": "A set of time series containing a single sample for each time series, all sharing the same timestamp"
+      },
+      "DataVectorResult": {
+        "type": "object",
+        "properties": {
+          "metric": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "The data points' labels"
+          },
+          "value": {
+            "$ref": "#\/components\/schemas\/DataValue"
+          }
+        },
+        "title": "Time series containing a single sample for each time series, all sharing the same timestamp"
+      },
+      "GetMetricsRequestGroupBy": {
+        "type": "string",
+        "enum": [
+          "NONE",
+          "INSTANCE_NAME"
+        ],
+        "default": "NONE",
+        "title": "The available fields to group instance metrics by"
+      },
+      "MetricsData": {
+        "type": "object",
+        "properties": {
+          "matrix": {
+            "$ref": "#\/components\/schemas\/DataMatrix"
+          },
+          "vector": {
+            "$ref": "#\/components\/schemas\/DataVector"
+          }
+        },
+        "title": "The data points in a metrics collection"
+      },
+      "VirtualMachineStatusPhase": {
+        "type": "string",
+        "enum": [
+          "UNKNOWN",
+          "PENDING",
+          "SCHEDULING",
+          "STARTING",
+          "RUNNING",
+          "STOPPED",
+          "FAILED"
+        ],
+        "default": "UNKNOWN"
+      },
+      "VolumeClaimVolumeClaimPhase": {
+        "type": "string",
+        "enum": [
+          "VOLUME_CLAIM_PHASE_UNSPECIFIED",
+          "PENDING",
+          "UNBOUND",
+          "BOUND"
+        ],
+        "default": "VOLUME_CLAIM_PHASE_UNSPECIFIED",
+        "description": "- VOLUME_CLAIM_PHASE_UNSPECIFIED: StackPath is unable to determine the volume claim's state\n - PENDING: The volume claim is pending\n - UNBOUND: The volume claim is unbound\n - BOUND: The volume claim is bound to an instance",
+        "title": "Which phase a volume claim is currently in"
+      },
+      "apiStatusDetail": {
+        "type": "object",
+        "properties": {
+          "@type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "@type"
+        ],
+        "discriminator": {
+          "propertyName": "@type"
+        }
+      },
+      "paginationPageInfo": {
+        "type": "object",
+        "properties": {
+          "totalCount": {
+            "type": "string",
+            "title": "The total number of items in the dataset"
+          },
+          "hasPreviousPage": {
+            "type": "boolean",
+            "format": "boolean",
+            "title": "Whether or not a previous page of data exists"
+          },
+          "hasNextPage": {
+            "type": "boolean",
+            "format": "boolean",
+            "title": "Whether or not another page of data is available"
+          },
+          "startCursor": {
+            "type": "string",
+            "title": "The cursor for the first item in the set of data returned"
+          },
+          "endCursor": {
+            "type": "string",
+            "title": "The cursor for the last item in the set of data returned"
+          }
+        },
+        "description": "This is modeled after the GraphQL Relay spec to support both cursor based pagination and traditional offset based pagination.",
+        "title": "Information about a paginated response"
+      },
+      "paginationPageRequest": {
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "string",
+            "title": "The number of items desired"
+          },
+          "after": {
+            "type": "string",
+            "title": "The cursor value after which data will be returned"
+          },
+          "filter": {
+            "type": "string",
+            "title": "SQL-style constraint filters"
+          },
+          "sortBy": {
+            "type": "string",
+            "title": "Sort the response by the given field"
+          }
+        },
+        "description": "This is modeled after the GraphQL Relay spec to support both cursor based pagination and traditional offset based pagination.",
+        "title": "Pagination request information"
+      },
+      "prometheusMetrics": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#\/components\/schemas\/prometheusMetricsStatus"
+          },
+          "data": {
+            "$ref": "#\/components\/schemas\/MetricsData"
+          },
+          "errorType": {
+            "type": "string",
+            "title": "The type of error encountered when querying for metrics"
+          },
+          "error": {
+            "type": "string",
+            "title": "The error encountered when querying for metrics"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings encountered when querying for metrics"
+          }
+        },
+        "title": "A collection of metrics"
+      },
+      "prometheusMetricsStatus": {
+        "type": "string",
+        "enum": [
+          "SUCCESS",
+          "ERROR"
+        ],
+        "default": "SUCCESS",
+        "title": "A metrics query's resulting status"
+      },
+      "stackpath.rpc.BadRequest": {
+        "allOf": [
+          {
+            "$ref": "#\/components\/schemas\/apiStatusDetail"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "fieldViolations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#\/components\/schemas\/stackpath.rpc.BadRequest.FieldViolation"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "stackpath.rpc.BadRequest.FieldViolation": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "stackpath.rpc.Help": {
+        "allOf": [
+          {
+            "$ref": "#\/components\/schemas\/apiStatusDetail"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "links": {
+                "type": "array",
+                "items": {
+                  "$ref": "#\/components\/schemas\/stackpath.rpc.Help.Link"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "stackpath.rpc.Help.Link": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "stackpath.rpc.LocalizedMessage": {
+        "allOf": [
+          {
+            "$ref": "#\/components\/schemas\/apiStatusDetail"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "locale": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "stackpath.rpc.PreconditionFailure": {
+        "allOf": [
+          {
+            "$ref": "#\/components\/schemas\/apiStatusDetail"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "violations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#\/components\/schemas\/stackpath.rpc.PreconditionFailure.Violation"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "stackpath.rpc.PreconditionFailure.Violation": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "stackpath.rpc.QuotaFailure": {
+        "allOf": [
+          {
+            "$ref": "#\/components\/schemas\/apiStatusDetail"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "violations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#\/components\/schemas\/stackpath.rpc.QuotaFailure.Violation"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "stackpath.rpc.QuotaFailure.Violation": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "stackpath.rpc.RequestInfo": {
+        "allOf": [
+          {
+            "$ref": "#\/components\/schemas\/apiStatusDetail"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "requestId": {
+                "type": "string"
+              },
+              "servingData": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "stackpath.rpc.ResourceInfo": {
+        "allOf": [
+          {
+            "$ref": "#\/components\/schemas\/apiStatusDetail"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "resourceType": {
+                "type": "string"
+              },
+              "resourceName": {
+                "type": "string"
+              },
+              "owner": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "stackpath.rpc.RetryInfo": {
+        "allOf": [
+          {
+            "$ref": "#\/components\/schemas\/apiStatusDetail"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "retryDelay": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "stackpathapiStatus": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "error": {
+            "type": "string"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/apiStatusDetail"
+            }
+          }
+        }
+      },
+      "v1ContainerSpec": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "title": "The location of a Docker image to run as a container"
+          },
+          "command": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "title": "The commands that start a container"
+          },
+          "env": {
+            "$ref": "#\/components\/schemas\/v1EnvironmentVariableMapEntry"
+          },
+          "ports": {
+            "$ref": "#\/components\/schemas\/v1InstancePortMapEntry"
+          },
+          "livenessProbe": {
+            "$ref": "#\/components\/schemas\/v1Probe"
+          },
+          "readinessProbe": {
+            "$ref": "#\/components\/schemas\/v1Probe"
+          },
+          "resources": {
+            "$ref": "#\/components\/schemas\/v1ResourceRequirements"
+          },
+          "volumeMounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/v1InstanceVolumeMount"
+            },
+            "title": "Volumes to mount in the container"
+          }
+        },
+        "title": "The specification for the desired state of a container in a workload"
+      },
+      "v1ContainerSpecMapEntry": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#\/components\/schemas\/v1ContainerSpec"
+        },
+        "title": "A string to container configuration key\/value pair"
+      },
+      "v1ContainerStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "A container status' name"
+          },
+          "phase": {
+            "$ref": "#\/components\/schemas\/v1ContainerStatusContainerPhase"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "The date a container started"
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "The date a container terminated"
+          },
+          "waiting": {
+            "$ref": "#\/components\/schemas\/ContainerStatusWaiting"
+          },
+          "running": {
+            "$ref": "#\/components\/schemas\/ContainerStatusRunning"
+          },
+          "terminated": {
+            "$ref": "#\/components\/schemas\/ContainerStatusTerminated"
+          },
+          "ready": {
+            "type": "boolean",
+            "format": "boolean",
+            "title": "Whether or not a container is running and ready for service"
+          },
+          "restartCount": {
+            "type": "integer",
+            "format": "int32",
+            "title": "How many times a container has restarted since it was first started"
+          },
+          "containerId": {
+            "type": "string",
+            "title": "A unique value that identifies a container"
+          }
+        },
+        "title": "The status of a container in a workload"
+      },
+      "v1ContainerStatusContainerPhase": {
+        "type": "string",
+        "enum": [
+          "CONTAINER_PHASE_UNSPECIFIED",
+          "STARTING",
+          "RUNNING",
+          "FAILED",
+          "STOPPED"
+        ],
+        "default": "CONTAINER_PHASE_UNSPECIFIED",
+        "description": "- CONTAINER_PHASE_UNSPECIFIED: The container has not reported a state back or StackPath is unable to determine the container's state\n - STARTING: The container is starting up\n - RUNNING: The container is running\n - FAILED: The container has terminated due to a failure\n - STOPPED: The container was terminated by the user",
+        "title": "Which phase of runtime a container is currently in"
+      },
+      "v1CreateWorkloadRequest": {
+        "type": "object",
+        "properties": {
+          "workload": {
+            "$ref": "#\/components\/schemas\/v1Workload"
+          }
+        },
+        "title": "A request to create a workload"
+      },
+      "v1CreateWorkloadResponse": {
+        "type": "object",
+        "properties": {
+          "workload": {
+            "$ref": "#\/components\/schemas\/v1Workload"
+          }
+        },
+        "title": "A response from a request to add a workload to a stack"
+      },
+      "v1DeploymentSpec": {
+        "type": "object",
+        "properties": {
+          "minReplicas": {
+            "type": "integer",
+            "format": "int32",
+            "title": "The minimum number of running containers a deployment should run"
+          },
+          "selectors": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/v1MatchExpression"
+            },
+            "title": "A collection of filters that match the deployment's scope"
+          }
+        },
+        "title": "A deployment's specification"
+      },
+      "v1EnvironmentVariable": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "title": "An environment variable's value"
+          }
+        },
+        "title": "The location to obtain a value for an environment variable"
+      },
+      "v1EnvironmentVariableMapEntry": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#\/components\/schemas\/v1EnvironmentVariable"
+        },
+        "title": "A string to environment variable key\/value pair"
+      },
+      "v1GetLocationsResponse": {
+        "type": "object",
+        "properties": {
+          "pageInfo": {
+            "$ref": "#\/components\/schemas\/paginationPageInfo"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/workloadv1Location"
+            },
+            "title": "The requested locations"
+          }
+        },
+        "title": "A response from a request to retrieve the locations a workload may be created at"
+      },
+      "v1GetMetricsRequestGranularity": {
+        "type": "string",
+        "enum": [
+          "DEFAULT",
+          "PT5M",
+          "PT1H",
+          "P1D",
+          "PT1M"
+        ],
+        "default": "DEFAULT",
+        "description": "This field does not apply when retrieving INSTANCE type metrics\n\n - DEFAULT: The current default is PT5M\n - PT5M: Metrics every five minutes\n - PT1H: Metrics every hour\n - P1D: Metrics every day\n - PT1M: Metrics every one minute",
+        "title": "The time granularity of retrieved metrics"
+      },
+      "v1GetMetricsRequestTrafficRegion": {
+        "type": "string",
+        "enum": [
+          "ALL",
+          "LOCAL_NODE",
+          "LOCAL_POP",
+          "NORTH_AMERICA",
+          "EUROPE",
+          "ASIA",
+          "OCEANIA",
+          "SOUTH_AMERICA",
+          "MARKETPLACE",
+          "INTERNAL",
+          "INTERNET"
+        ],
+        "default": "ALL",
+        "description": "This field does not apply when retrieving INSTANCE type metrics",
+        "title": "A geographic or network region to filter traffic metrics for"
+      },
+      "v1GetMetricsRequestType": {
+        "type": "string",
+        "enum": [
+          "BANDWIDTH",
+          "INSTANCE"
+        ],
+        "default": "BANDWIDTH",
+        "description": "- BANDWIDTH: Bandwidth ingress and egress metrics\n - INSTANCE: Instance CPU, memory, and filesystem metrics",
+        "title": "The types of metrics that can be retrieved"
+      },
+      "v1GetWorkloadInstancesResponse": {
+        "type": "object",
+        "properties": {
+          "pageInfo": {
+            "$ref": "#\/components\/schemas\/paginationPageInfo"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/workloadv1Instance"
+            },
+            "title": "The requested workload instances"
+          }
+        },
+        "title": "A response from a request to retrieve a workload's instances"
+      },
+      "v1GetWorkloadResponse": {
+        "type": "object",
+        "properties": {
+          "workload": {
+            "$ref": "#\/components\/schemas\/v1Workload"
+          }
+        },
+        "title": "A response from a request to retrieve an individual workload"
+      },
+      "v1GetWorkloadsResponse": {
+        "type": "object",
+        "properties": {
+          "pageInfo": {
+            "$ref": "#\/components\/schemas\/paginationPageInfo"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/v1Workload"
+            },
+            "title": "The requested workloads"
+          }
+        },
+        "title": "A response from a request to retrieve a stack's workloads"
+      },
+      "v1HTTPGetAction": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "title": "The path portion of the URL to request"
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "title": "The TCP port to query in the HTTP request"
+          },
+          "scheme": {
+            "type": "string",
+            "title": "HTTP scheme to use in the HTTP request"
+          },
+          "httpHeaders": {
+            "$ref": "#\/components\/schemas\/v1StringMapEntry"
+          }
+        },
+        "title": "Execute an HTTP GET request against an endpoint running on an instance"
+      },
+      "v1InstancePort": {
+        "type": "object",
+        "properties": {
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "title": "The network port to listen on"
+          },
+          "protocol": {
+            "type": "string",
+            "description": "Values are either \"TCP\" or \"UDP\". Defaults to \"TCP\".",
+            "title": "The network protocol for the port"
+          }
+        },
+        "title": "A network port to be opened to the Internet on an instance of a workload"
+      },
+      "v1InstancePortMapEntry": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#\/components\/schemas\/v1InstancePort"
+        },
+        "title": "A string to network port key\/value pair"
+      },
+      "v1InstanceVolumeMount": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "title": "The slug of the volume claim to mount"
+          },
+          "mountPath": {
+            "type": "string",
+            "title": "The path in an instance to mount a volume"
+          }
+        },
+        "title": "Describes mounting a volume on containers or vms in an instance"
+      },
+      "v1LogChunk": {
+        "type": "object",
+        "properties": {
+          "bytes": {
+            "type": "string",
+            "format": "byte",
+            "title": "Raw log contents"
+          }
+        },
+        "title": "A chunk of raw log data"
+      },
+      "v1MatchExpression": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "The name of the selector to perform a match against"
+          },
+          "operator": {
+            "type": "string",
+            "description": "Valid values are \"In\", \"NotIn\", \"Exists\", and \"DoesNotExist\".",
+            "title": "The operation to perform to match a selector"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "title": "The values to match in the selector"
+          }
+        },
+        "title": "An expression to match selectors against a set of values"
+      },
+      "v1Metadata": {
+        "type": "object",
+        "properties": {
+          "annotations": {
+            "$ref": "#\/components\/schemas\/v1StringMapEntry"
+          },
+          "labels": {
+            "$ref": "#\/components\/schemas\/v1StringMapEntry"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "The date that a metadata entry was created"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "The date that a metadata entry was last updated"
+          },
+          "deleteRequestedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "The date an entity was requested to be deleted"
+          },
+          "version": {
+            "type": "string",
+            "description": "Metadata versions start at 1 when they are created and increment by 1 every time they are updated.",
+            "title": "A metadata entry's version number"
+          }
+        },
+        "title": "Metadata associated with an entity"
+      },
+      "v1NetworkInterface": {
+        "type": "object",
+        "properties": {
+          "network": {
+            "type": "string",
+            "title": "A network interface's name"
+          }
+        },
+        "title": "Network interfaces that will be created on instances in the workload"
+      },
+      "v1Probe": {
+        "type": "object",
+        "properties": {
+          "httpGet": {
+            "$ref": "#\/components\/schemas\/v1HTTPGetAction"
+          },
+          "tcpSocket": {
+            "$ref": "#\/components\/schemas\/v1TCPSocketAction"
+          },
+          "initialDelaySeconds": {
+            "type": "integer",
+            "format": "int32",
+            "title": "The number of seconds after a workload instance has started before liveness probes are initiated"
+          },
+          "timeoutSeconds": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Defaults to 1 second. Minimum value is 1.",
+            "title": "The number of seconds after which a probe times out"
+          },
+          "periodSeconds": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Default to 10 seconds. Minimum value is 1.",
+            "title": "How often, in seconds, to perform a probe"
+          },
+          "successThreshold": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Defaults to 1. Must be 1 for liveness. Minimum value is 1.",
+            "title": "The minimum consecutive successes for a probe to be considered successful after having failed"
+          },
+          "failureThreshold": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Defaults to 3. Minimum value is 1.",
+            "title": "The minimum consecutive failures for a probe to be considered failed after having succeeded"
+          }
+        },
+        "title": "A health check probe against a workload instance to determine if it is alive or ready to receive traffic"
+      },
+      "v1ResourceRequirements": {
+        "type": "object",
+        "properties": {
+          "requests": {
+            "$ref": "#\/components\/schemas\/v1StringMapEntry"
+          },
+          "limits": {
+            "$ref": "#\/components\/schemas\/v1StringMapEntry"
+          }
+        },
+        "description": "Resource requirements are key\/value pairs.",
+        "title": "Resource requirements for an object"
+      },
+      "v1StringMapEntry": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "A string to string key\/value pair"
+      },
+      "v1TCPSocketAction": {
+        "type": "object",
+        "properties": {
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "title": "The TCP port to quert"
+          }
+        },
+        "title": "Connect to an instance's TCP port"
+      },
+      "v1Target": {
+        "type": "object",
+        "properties": {
+          "spec": {
+            "$ref": "#\/components\/schemas\/v1TargetSpec"
+          }
+        },
+        "title": "How instances in a workload should be deployed"
+      },
+      "v1TargetMapEntry": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#\/components\/schemas\/v1Target"
+        },
+        "title": "A string to deployment target key\/value pair"
+      },
+      "v1TargetSpec": {
+        "type": "object",
+        "properties": {
+          "deploymentScope": {
+            "type": "string",
+            "title": "The scope at which a deployment should be created. Valid values are: \"cityCode\""
+          },
+          "deployments": {
+            "$ref": "#\/components\/schemas\/v1DeploymentSpec"
+          }
+        },
+        "title": "The specification for a target"
+      },
+      "v1UpdateWorkloadRequest": {
+        "type": "object",
+        "properties": {
+          "workload": {
+            "$ref": "#\/components\/schemas\/v1Workload"
+          }
+        },
+        "title": "A request to update a workload"
+      },
+      "v1UpdateWorkloadResponse": {
+        "type": "object",
+        "properties": {
+          "workload": {
+            "$ref": "#\/components\/schemas\/v1Workload"
+          }
+        },
+        "title": "A response from a request to update a workload"
+      },
+      "v1VirtualMachineSpec": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "title": "The location of a Docker image to run as a virtual machine"
+          },
+          "ports": {
+            "$ref": "#\/components\/schemas\/v1InstancePortMapEntry"
+          },
+          "livenessProbe": {
+            "$ref": "#\/components\/schemas\/v1Probe"
+          },
+          "readinessProbe": {
+            "$ref": "#\/components\/schemas\/v1Probe"
+          },
+          "resources": {
+            "$ref": "#\/components\/schemas\/v1ResourceRequirements"
+          },
+          "volumeMounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/v1InstanceVolumeMount"
+            },
+            "title": "Volumes to mount in the virtual machine"
+          }
+        },
+        "title": "The specification for the desired state of a virtual machine in a workload"
+      },
+      "v1VirtualMachineSpecMapEntry": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#\/components\/schemas\/v1VirtualMachineSpec"
+        },
+        "title": "A string to virtual machine configuration key\/value pair"
+      },
+      "v1VirtualMachineStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "The name of the virtual machine the status applies to"
+          },
+          "phase": {
+            "$ref": "#\/components\/schemas\/VirtualMachineStatusPhase"
+          },
+          "reason": {
+            "type": "string",
+            "title": "A short reason why the virtual machine is in its current phase"
+          },
+          "message": {
+            "type": "string",
+            "title": "A longer message with details about why the virtual machine is in its current phase"
+          }
+        },
+        "title": "The status of a Virtual Machine"
+      },
+      "v1VolumeClaim": {
+        "type": "object",
+        "properties": {
+          "stackId": {
+            "type": "string",
+            "title": "The ID of the stack that a volume claim belongs to"
+          },
+          "id": {
+            "type": "string",
+            "title": "A volume claim's unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "title": "A volume claim's name as it appears in the StackPath portal"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Volume claim slugs are used to programatically label a claim",
+            "title": "A volume claim's programmatic name"
+          },
+          "metadata": {
+            "$ref": "#\/components\/schemas\/v1Metadata"
+          },
+          "spec": {
+            "$ref": "#\/components\/schemas\/v1VolumeClaimSpec"
+          },
+          "phase": {
+            "$ref": "#\/components\/schemas\/VolumeClaimVolumeClaimPhase"
+          }
+        },
+        "description": "Volumes may be attached to workload instance containers or virtual machines",
+        "title": "A claim for a volume"
+      },
+      "v1VolumeClaimSpec": {
+        "type": "object",
+        "properties": {
+          "resources": {
+            "$ref": "#\/components\/schemas\/v1ResourceRequirements"
+          }
+        },
+        "title": "The specification for a volume claim"
+      },
+      "v1Workload": {
+        "type": "object",
+        "properties": {
+          "stackId": {
+            "type": "string",
+            "title": "The ID of the stack that a workload belongs to"
+          },
+          "id": {
+            "type": "string",
+            "title": "A workload's unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "title": "A workload's name as it appears in the StackPath portal"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Workload slugs are used to build its instances names",
+            "title": "A workload's programmatic name"
+          },
+          "metadata": {
+            "$ref": "#\/components\/schemas\/v1Metadata"
+          },
+          "spec": {
+            "$ref": "#\/components\/schemas\/v1WorkloadSpec"
+          },
+          "targets": {
+            "$ref": "#\/components\/schemas\/v1TargetMapEntry"
+          },
+          "status": {
+            "$ref": "#\/components\/schemas\/v1WorkloadStatus"
+          }
+        },
+        "description": "Workloads define a computing application to deploy to StackPath's edge network.",
+        "title": "A computing workload"
+      },
+      "v1WorkloadSpec": {
+        "type": "object",
+        "properties": {
+          "networkInterfaces": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/v1NetworkInterface"
+            },
+            "title": "Network interfaces to bind to the workload's instances"
+          },
+          "containers": {
+            "$ref": "#\/components\/schemas\/v1ContainerSpecMapEntry"
+          },
+          "virtualMachines": {
+            "$ref": "#\/components\/schemas\/v1VirtualMachineSpecMapEntry"
+          },
+          "volumeClaimTemplates": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/v1VolumeClaim"
+            },
+            "description": "The slug of the claim will be used in combination with the name of the instance to create a stable identifier. The slug should be used in the volume mount specifications for containers and VMs.",
+            "title": "A list of claims that instances may reference"
+          }
+        },
+        "title": "The specification for the desired state of a workload"
+      },
+      "v1WorkloadStatus": {
+        "type": "string",
+        "enum": [
+          "ACTIVE",
+          "SUSPENDED",
+          "BILLING_SUSPENDED",
+          "INACTIVE"
+        ],
+        "default": "ACTIVE",
+        "description": "- ACTIVE: The workload is active\n - SUSPENDED: The workload is suspended\n - BILLING_SUSPENDED: The workload is suspended due to non-payment\n - INACTIVE: The workload is inactive or has been deleted",
+        "title": "Which status a workload is currently in"
+      },
+      "workloadv1Instance": {
+        "type": "object",
+        "properties": {
+          "stackId": {
+            "type": "string",
+            "title": "The ID of the stack that an instance belongs to"
+          },
+          "workloadId": {
+            "type": "string",
+            "title": "The ID of the workload that an instance belongs to"
+          },
+          "id": {
+            "type": "string",
+            "title": "An instance's unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Instance names are generated from their corresponsing workload's slug, followed by a unique hash",
+            "title": "An instance's name"
+          },
+          "metadata": {
+            "$ref": "#\/components\/schemas\/v1Metadata"
+          },
+          "location": {
+            "$ref": "#\/components\/schemas\/workloadv1Location"
+          },
+          "phase": {
+            "$ref": "#\/components\/schemas\/workloadv1InstanceInstancePhase"
+          },
+          "ipAddress": {
+            "type": "string",
+            "title": "An instance's IP address"
+          },
+          "externalIpAddress": {
+            "type": "string",
+            "title": "An instance's publicly accessible IP address"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "The date an instance was created"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "The date an instance was started"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "The date an instance was deleted"
+          },
+          "networkInterfaces": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/workloadv1NetworkInterfaceStatus"
+            },
+            "title": "An instance's network interfaces"
+          },
+          "resources": {
+            "$ref": "#\/components\/schemas\/v1ResourceRequirements"
+          },
+          "containers": {
+            "$ref": "#\/components\/schemas\/v1ContainerSpecMapEntry"
+          },
+          "containerStatuses": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/v1ContainerStatus"
+            },
+            "title": "Status of the containers running within the workload instance"
+          },
+          "virtualMachines": {
+            "$ref": "#\/components\/schemas\/v1VirtualMachineSpecMapEntry"
+          },
+          "virtualMachineStatuses": {
+            "type": "array",
+            "items": {
+              "$ref": "#\/components\/schemas\/v1VirtualMachineStatus"
+            },
+            "title": "The status of the virtual machines running within the workload instance"
+          },
+          "reason": {
+            "type": "string",
+            "title": "A short reason that explains why an instance is in a phase"
+          },
+          "message": {
+            "type": "string",
+            "title": "A longer message that provides more detail on why an instance is in a phase"
+          },
+          "scheduledAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "The date an instance was scheduled"
+          }
+        },
+        "title": "An instance of a workload deployment"
+      },
+      "workloadv1InstanceInstancePhase": {
+        "type": "string",
+        "enum": [
+          "INSTANCE_PHASE_UNSPECIFIED",
+          "STARTING",
+          "RUNNING",
+          "FAILED",
+          "COMPLETED",
+          "SCHEDULING"
+        ],
+        "default": "INSTANCE_PHASE_UNSPECIFIED",
+        "description": "- INSTANCE_PHASE_UNSPECIFIED: StackPath is unable to determine the instance's startup state\n - STARTING: The instance is still initializing\n - RUNNING: The instance is running\n - FAILED: The instance failed to start\n - COMPLETED: The instance finished running\n - SCHEDULING: The instance is being scheduled",
+        "title": "An instance's startup state"
+      },
+      "workloadv1Location": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "A human readable location name"
+          },
+          "city": {
+            "type": "string",
+            "title": "A location's city"
+          },
+          "cityCode": {
+            "type": "string",
+            "title": "A location's city, expressed as an IATA airport code"
+          },
+          "subdivision": {
+            "type": "string",
+            "title": "A location's subdivision"
+          },
+          "subdivisionCode": {
+            "type": "string",
+            "title": "A location's subdivision code"
+          },
+          "country": {
+            "type": "string",
+            "title": "A location's country"
+          },
+          "countryCode": {
+            "type": "string",
+            "title": "A location's ISO-3166-1 alpha-2 country code"
+          },
+          "region": {
+            "type": "string",
+            "title": "A location's state or province"
+          },
+          "regionCode": {
+            "type": "string",
+            "title": "A location's ISO-3166-2 region code"
+          },
+          "continent": {
+            "type": "string",
+            "title": "A location's continent"
+          },
+          "continentCode": {
+            "type": "string",
+            "title": "A location's continent code"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double",
+            "title": "A location's geographic latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double",
+            "title": "A location's geographic longitude"
+          }
+        },
+        "title": "Geographic location information"
+      },
+      "workloadv1NetworkInterfaceStatus": {
+        "type": "object",
+        "properties": {
+          "network": {
+            "type": "string",
+            "title": "A network interface's name"
+          },
+          "ipAddress": {
+            "type": "string",
+            "title": "A network interface's primary IP address"
+          },
+          "ipAddressAliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "title": "Additional IP addresses bound to a network interface"
+          },
+          "gateway": {
+            "type": "string",
+            "title": "A network interface's gateway address"
+          }
+        },
+        "title": "Network interfaces that are attached to an instance in a workload"
+      }
+    }
+  },
+  "x-explorer-enabled": true,
+  "x-proxy-enabled": true,
+  "x-samples-enabled": true,
+  "x-samples-languages": [
+    "curl",
+    "node",
+    "ruby",
+    "javascript",
+    "python"
+  ]
+}

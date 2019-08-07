@@ -55,6 +55,54 @@
       }
     }
   },
+  "customer-castle.json": {
+    "preferred": "1.0",
+    "versions": {
+      "1.0": {
+        "swaggerUrl": "swagger-files/customer-castle.json"
+      }
+    }
+  },
+  "customer-fare.json": {
+    "preferred": "1.0",
+    "versions": {
+      "1.0": {
+        "swaggerUrl": "swagger-files/customer-fare.json"
+      }
+    }
+  },
+  "customer-justeat.json": {
+    "preferred": "v1",
+    "versions": {
+      "v1": {
+        "swaggerUrl": "swagger-files/customer-justeat.json"
+      }
+    }
+  },
+  "customer-liftforward.json": {
+    "preferred": "0.4.0",
+    "versions": {
+      "0.4.0": {
+        "swaggerUrl": "swagger-files/customer-liftforward.json"
+      }
+    }
+  },
+  "customer-stackpath.json": {
+    "preferred": "1.0",
+    "versions": {
+      "1.0": {
+        "swaggerUrl": "swagger-files/customer-stackpath.json"
+      }
+    }
+  },
+  "customer-tenable.json": {
+    "preferred": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "swaggerUrl": "swagger-files/customer-tenable.json"
+      }
+    }
+  },
   "endpoint-error-boundary.json": {
     "preferred": "1.0.0",
     "versions": {

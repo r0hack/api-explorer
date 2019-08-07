@@ -1,0 +1,6171 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "JustEat Public Partner API",
+    "version": "v1",
+    "description": "# Getting Started\n## Swagger UI\nOur API docs are also available via swagger UI, see https://justeat.github.io/partnerapi-docs/swagger-ui\n## Security\n### HTTPS\nAll api calls and callbacks require HTTPS. Your service will need a valid SSL certificate and be accesible via the standard SSL port (port 443).\n## Making an API request\n```\nPUT https://uk-partnerapi.just-eat.io/orders/abcd1234 HTTP/1.1\nHost: uk-partnerapi.just-eat.io\nAuthorization: JE-API-KEY abcd123456789\nContent-Length: 1000\nContent-Type: application/json\n```\n## Date Formats\n### Date and time formats\nAll dates and times should use the [ISO 8601 standard for representation of dates and times](https://en.wikipedia.org/wiki/ISO_8601).\n\nTimes recorded by Just Eat are either stored in:\n  * UTC time standard with no offset; OR\n  * Local time with an accompanying offset to UTC time\n\nAll properties ending with `WithUtcOffset` contain local time along with an offset to UTC time.\n\n#### For instance:\n* DueDateWithUtcOffset: `\"2015-05-26T14:52:35.5444292+01:00\"`\n  - Local time: `14:52`\n  - UTC time: `13:52`\n  - UTC offset: `+1hr` (due to daylight time saving)\n* DueDateWithUtcOffset: `\"2015-02-03T11:10:00.0000000+00:00\"`\n  - Local time: `11:10`\n  - UTC time: `11:10`\n  - UTC offset: `0` (no daylight time saving, local time is equivalent to UTC)\n\nNote that the offset may be for a timezone different to your own, so you should alway convert to your own local time for display purposes (e.g. on receipts and terminals).\n\n### Callback timestamps\nIdeally, timestamps sent to Just Eat should be recorded as the current local time (including any changes needed to account for daylight saving) with an accompanying offset that shows the difference between the recorded local time and the current UTC time.  \n\nIf it is not possible to record timestamps in local time, timestamps may be recorded in UTC time with a 00:00 offset.\n## Async Webhooks\nSome of the webhooks on the platform are configured as being 'async' webhooks. These are for long-running operations, and work as follows:\n  1. Your webhook is invoked with a `?callback={returnUrl}` query string parameter. The `returnUrl` is a unique URL that you will need to send the async response to.\n  2. Return an immediate `202 Accepted` response from the webhook endpoint, to indicate that you have received the request.\n  3. Perform the long-running operation. This can be deemed either a _success_; or a _failure_.\n  4. If the result is a _**success**_, return the following:\n  ```\n  POST {returnUrl} HTTP/1.1\n  \n  {\n        \"status\": \"Success\",\n        \"message\": \"{successMessage}\",\n        \"data\": {}   // webhook-specific response object\n  }\n  ```\n  5. Otherwise, if the result is a _**failure**_, return the following:\n  ```\n  POST {returnUrl} HTTP/1.1\n  \n  {\n        \"status\": \"Failure\",\n        \"message\": \"{failureMessage}\",\n        \"data\": {}   // webhook-specific response object\n  }\n  ```",
+    "contact": {
+      "name": "JustEat Technology",
+      "url": "https://developers.just-eat.com/"
+    }
+  },
+  "paths": {
+    "/delivery/pools/{poolId}/hours": {
+      "put": {
+        "tags": [
+          "DeliveryHours"
+        ],
+        "summary": "Sets delivery hours for a pool from a RDS partner",
+        "operationId": "Put",
+        "parameters": [
+          {
+            "name": "poolId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeliveryHoursRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeliveryHoursRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeliveryHoursRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeliveryHoursRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/delivery/pools/{poolId}/availability/relative": {
+      "get": {
+        "tags": [
+          "DeliveryPoolAvailability"
+        ],
+        "summary": "Retrieves ppETA (gate) value from a RDS partner",
+        "operationId": "GetRelativePoolAvailability",
+        "parameters": [
+          {
+            "name": "poolId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelativePoolAvailabilityResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelativePoolAvailabilityResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelativePoolAvailabilityResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "DeliveryPoolAvailability"
+        ],
+        "summary": "Sets ppETA (gate) value from a RDS partner",
+        "operationId": "PutRelativePoolAvailability",
+        "parameters": [
+          {
+            "name": "poolId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelativePoolAvailability"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelativePoolAvailability"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelativePoolAvailability"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelativePoolAvailability"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/delivery/pools": {
+      "get": {
+        "tags": [
+          "DeliveryPoolsApi"
+        ],
+        "summary": "Retrieves all pools by provided tenant",
+        "operationId": "Get",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/GetDeliveryPoolsResponseItem"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/GetDeliveryPoolsResponseItem"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/GetDeliveryPoolsResponseItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "DeliveryPoolsApi"
+        ],
+        "summary": "Creates a pool",
+        "operationId": "Create",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeliveryPoolRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeliveryPoolRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeliveryPoolRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeliveryPoolRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDeliveryPoolResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDeliveryPoolResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDeliveryPoolResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/delivery/pools/{poolId}": {
+      "get": {
+        "tags": [
+          "DeliveryPoolsApi"
+        ],
+        "summary": "Retrieves all pools by provided pool id",
+        "operationId": "Get",
+        "parameters": [
+          {
+            "name": "poolId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDeliveryPoolResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDeliveryPoolResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDeliveryPoolResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "DeliveryPoolsApi"
+        ],
+        "summary": "Updates pool by pool id",
+        "operationId": "Edit",
+        "parameters": [
+          {
+            "name": "poolId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditDeliveryPoolRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditDeliveryPoolRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditDeliveryPoolRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditDeliveryPoolRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditDeliveryPoolResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditDeliveryPoolResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditDeliveryPoolResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "DeliveryPoolsApi"
+        ],
+        "summary": "Updates pool by pool id",
+        "operationId": "Edit",
+        "parameters": [
+          {
+            "name": "poolId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceDeliveryPoolRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceDeliveryPoolRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceDeliveryPoolRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceDeliveryPoolRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditDeliveryPoolResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditDeliveryPoolResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditDeliveryPoolResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "DeliveryPoolsApi"
+        ],
+        "summary": "Deletes pool by pool id",
+        "operationId": "Delete",
+        "parameters": [
+          {
+            "name": "poolId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/delivery/pools/{poolId}/restaurants": {
+      "put": {
+        "tags": [
+          "DeliveryPoolsApi"
+        ],
+        "summary": "Updates collection of restaurants for a pool",
+        "operationId": "AddRestaurant",
+        "parameters": [
+          {
+            "name": "poolId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPoolRestaurantsRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPoolRestaurantsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPoolRestaurantsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPoolRestaurantsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "DeliveryPoolsApi"
+        ],
+        "summary": "Deletes collection of restaurants for a pool",
+        "operationId": "DeleteRestaurant",
+        "parameters": [
+          {
+            "name": "poolId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemovePoolRestaurantsRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemovePoolRestaurantsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemovePoolRestaurantsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemovePoolRestaurantsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{orderId}/deliverystate/atrestauranteta": {
+      "put": {
+        "tags": [
+          "Delivery"
+        ],
+        "summary": "Provide an estimate of when a driver will arrive at a restaurant to collect an order",
+        "operationId": "PutDriverAtRestaurantEta",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverAtRestaurantEtaBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverAtRestaurantEtaBody"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverAtRestaurantEtaBody"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverAtRestaurantEtaBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/Delivery/Estimate": {
+      "get": {
+        "tags": [
+          "DeliveryEstimate"
+        ],
+        "operationId": "DeliveryEstimate",
+        "parameters": [
+          {
+            "name": "RestaurantReference",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ToLat",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ToLon",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ToPostcode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{orderId}/deliverystate/driverassigned": {
+      "put": {
+        "tags": [
+          "DriverAssigned"
+        ],
+        "operationId": "DriverAssigned",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDriverAssignedBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDriverAssignedBody"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDriverAssignedBody"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDriverAssignedBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/orders/{orderId}/deliverystate/atdeliveryaddress": {
+      "put": {
+        "tags": [
+          "DriverAtDeliveryAddress"
+        ],
+        "operationId": "DriverAtDeliveryAddress",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDetails"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDetails"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDetails"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDetails"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/orders/{orderId}/deliverystate/atrestaurant": {
+      "put": {
+        "tags": [
+          "DriverAtRestaurant"
+        ],
+        "operationId": "DriverAtRestaurant",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverAtRestaurantDetails"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverAtRestaurantDetails"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverAtRestaurantDetails"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverAtRestaurantDetails"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/orders/{orderId}/deliverystate/delivered": {
+      "put": {
+        "tags": [
+          "DriverDelivered"
+        ],
+        "operationId": "Delivered",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDetails"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDetails"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDetails"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryDetails"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/orders/{orderId}/deliverystate/driverlocation": {
+      "put": {
+        "tags": [
+          "DriverLocation"
+        ],
+        "operationId": "DriverLocation",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverLocationBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverLocationBody"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverLocationBody"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverLocationBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/orders/deliverystate/driverlocation": {
+      "put": {
+        "tags": [
+          "DriverLocation"
+        ],
+        "operationId": "BulkDriverLocations",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "uniqueItems": false,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BulkDriverLocation"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "uniqueItems": false,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BulkDriverLocation"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "uniqueItems": false,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BulkDriverLocation"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "uniqueItems": false,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BulkDriverLocation"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/orders/{orderId}/deliverystate/onitsway": {
+      "put": {
+        "tags": [
+          "DriverOnWay"
+        ],
+        "operationId": "OnItsWay",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnItsWayDetails"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnItsWayDetails"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnItsWayDetails"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnItsWayDetails"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/orders/{orderId}/accept": {
+      "put": {
+        "tags": [
+          "Orders"
+        ],
+        "operationId": "Orders_AcceptOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "x-je-api-version",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptOrderRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          },
+          "409": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/orders/{orderId}/reject": {
+      "put": {
+        "tags": [
+          "Orders"
+        ],
+        "operationId": "Orders_RejectOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "x-je-api-version",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectOrderRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          },
+          "409": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/orders/{orderId}/cancel": {
+      "put": {
+        "tags": [
+          "Orders"
+        ],
+        "operationId": "Orders_CancelOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "x-je-api-version",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelOrderRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/orders/{orderId}/ignore": {
+      "put": {
+        "tags": [
+          "Orders"
+        ],
+        "operationId": "Orders_IgnoreOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "x-je-api-version",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          },
+          "409": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/webhook/callback/{trackingId}": {
+      "post": {
+        "tags": [
+          "Webhook"
+        ],
+        "operationId": "Webhook_Callback",
+        "parameters": [
+          {
+            "name": "trackingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "body",
+          "content": {
+            "application/json": {
+              "schema": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/WebhookCallbackRequest"
+                  }
+                ]
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/restaurants/{restaurantReference}/temporary-offline-status": {
+      "put": {
+        "tags": [
+          "RestaurantState"
+        ],
+        "operationId": "RestaurantState_TemporaryOfflineFromKong",
+        "parameters": [
+          {
+            "name": "restaurantReference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "status",
+          "content": {
+            "application/json": {
+              "schema": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/RestaurantTemporaryOffline"
+                  }
+                ]
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/orders/{orderId}/status": {
+      "put": {
+        "tags": [
+          "OrderStatus"
+        ],
+        "operationId": "OrderStatus_UpdateOrderStatus",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "partnerId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "statusRequest",
+          "content": {
+            "application/json": {
+              "schema": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateOrderStatusRequest"
+                  }
+                ]
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "202": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/partners/orders": {
+      "post": {
+        "tags": [
+          "PartnerOrders"
+        ],
+        "operationId": "PartnerOrders_CreateOrderV2",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "partnerSubscriptionId",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "x-je-api-version",
+            "in": "header",
+            "required": true,
+            "description": "API Version",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "2.0"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "order",
+          "content": {
+            "application/json": {
+              "schema": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/OrderRequestV2"
+                  }
+                ]
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/partners/{partnerId}/orders/{friendlyOrderRef}": {
+      "get": {
+        "tags": [
+          "PartnerOrders"
+        ],
+        "summary": "Gets a partner (non-JE) order",
+        "operationId": "PartnerOrders_GetOrderByReference",
+        "parameters": [
+          {
+            "name": "friendlyOrderRef",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "partnerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true,
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OrderRepresentation"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/orders/{orderId}": {
+      "get": {
+        "tags": [
+          "PartnerOrders"
+        ],
+        "summary": "Gets a new partner (non-JE) order",
+        "operationId": "PartnerOrders_GetOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true,
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OrderRepresentation"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "PartnerOrders"
+        ],
+        "summary": "Gets a new partner (non-JE) order",
+        "operationId": "PartnerOrders_GetOrder2",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true,
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OrderRepresentation"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/orders/{orderId}/sendtoposfailed": {
+      "put": {
+        "tags": [
+          "Pos"
+        ],
+        "operationId": "SendToPosFailed",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/v1/{tenant}/events/offline": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "statuses",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Events"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflineRequestModel"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflineRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflineRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflineRequestModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/{tenant}/events/offline/{eventid}": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Events"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Events"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/{tenant}/events/offline/{eventid}/logs": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{tenant}/restaurants/preview/filter": {
+      "post": {
+        "tags": [
+          "Restaurants"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FilterRequestModel"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FilterRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FilterRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FilterRequestModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{tenant}/restaurants/{id}/events": {
+      "get": {
+        "tags": [
+          "Restaurants"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "statuses",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{tenant}/restaurants/{id}/events/offline": {
+      "post": {
+        "tags": [
+          "Restaurants"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflineRestaurantRequestModel"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflineRestaurantRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflineRestaurantRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflineRestaurantRequestModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Restaurants"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "categoryUrlEncoded",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/{tenant}/restaurants/events/offline": {
+      "post": {
+        "tags": [
+          "Restaurants"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflineRestaurantsRequestModel"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflineRestaurantsRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflineRestaurantsRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflineRestaurantsRequestModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Restaurants"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/{tenant}/restaurants/{id}/events/logs": {
+      "get": {
+        "tags": [
+          "Restaurants"
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "au",
+                "ca",
+                "es",
+                "dk",
+                "ie",
+                "it",
+                "no",
+                "nz",
+                "uk"
+              ],
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{tenant}/Opening": {
+      "post": {
+        "tags": [
+          "CustomerOrderInfo"
+        ],
+        "summary": "Ivr entry point - Returns twilio instructions to play order information based on phone number specified at callRequest.From property",
+        "operationId": "Opening",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "description": "Available values : uk",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Twilio-Signature",
+            "in": "header",
+            "description": "The X-Twilio-Signature header attached to the request used to validate requests coming from Twilio",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "confirmedOrderId",
+            "in": "query",
+            "description": "Order id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "call-type",
+            "in": "query",
+            "description": "Available values : je-test-redirect-to-qa-agent, je-test-order-id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "AccountSid": {
+                    "type": "string"
+                  },
+                  "ApiVersion": {
+                    "type": "string"
+                  },
+                  "Called": {
+                    "type": "string"
+                  },
+                  "CalledCountry": {
+                    "type": "string"
+                  },
+                  "CalledState": {
+                    "type": "string"
+                  },
+                  "Caller": {
+                    "type": "string"
+                  },
+                  "CallerCountry": {
+                    "type": "string"
+                  },
+                  "CallSid": {
+                    "type": "string"
+                  },
+                  "CallStatus": {
+                    "type": "string"
+                  },
+                  "Digits": {
+                    "type": "string"
+                  },
+                  "Direction": {
+                    "type": "string"
+                  },
+                  "From": {
+                    "type": "string"
+                  },
+                  "FromCountry": {
+                    "type": "string"
+                  },
+                  "To": {
+                    "type": "string"
+                  },
+                  "ToCountry": {
+                    "type": "string"
+                  },
+                  "FinishedOnKey": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "AccountSid": {
+                  "style": "form"
+                },
+                "ApiVersion": {
+                  "style": "form"
+                },
+                "Called": {
+                  "style": "form"
+                },
+                "CalledCountry": {
+                  "style": "form"
+                },
+                "CalledState": {
+                  "style": "form"
+                },
+                "Caller": {
+                  "style": "form"
+                },
+                "CallerCountry": {
+                  "style": "form"
+                },
+                "CallSid": {
+                  "style": "form"
+                },
+                "CallStatus": {
+                  "style": "form"
+                },
+                "Digits": {
+                  "style": "form"
+                },
+                "Direction": {
+                  "style": "form"
+                },
+                "From": {
+                  "style": "form"
+                },
+                "FromCountry": {
+                  "style": "form"
+                },
+                "To": {
+                  "style": "form"
+                },
+                "ToCountry": {
+                  "style": "form"
+                },
+                "FinishedOnKey": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "TwilioSignature is not valid or failed request validation"
+          }
+        }
+      }
+    },
+    "/twilioivr/{tenant}/Opening": {
+      "post": {
+        "tags": [
+          "CustomerOrderInfo"
+        ],
+        "summary": "Ivr entry point - Returns twilio instructions to play order information based on phone number specified at callRequest.From property",
+        "operationId": "Opening",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "description": "Available values : uk",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Twilio-Signature",
+            "in": "header",
+            "description": "The X-Twilio-Signature header attached to the request used to validate requests coming from Twilio",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "confirmedOrderId",
+            "in": "query",
+            "description": "Order id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "call-type",
+            "in": "query",
+            "description": "Available values : je-test-redirect-to-qa-agent, je-test-order-id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "AccountSid": {
+                    "type": "string"
+                  },
+                  "ApiVersion": {
+                    "type": "string"
+                  },
+                  "Called": {
+                    "type": "string"
+                  },
+                  "CalledCountry": {
+                    "type": "string"
+                  },
+                  "CalledState": {
+                    "type": "string"
+                  },
+                  "Caller": {
+                    "type": "string"
+                  },
+                  "CallerCountry": {
+                    "type": "string"
+                  },
+                  "CallSid": {
+                    "type": "string"
+                  },
+                  "CallStatus": {
+                    "type": "string"
+                  },
+                  "Digits": {
+                    "type": "string"
+                  },
+                  "Direction": {
+                    "type": "string"
+                  },
+                  "From": {
+                    "type": "string"
+                  },
+                  "FromCountry": {
+                    "type": "string"
+                  },
+                  "To": {
+                    "type": "string"
+                  },
+                  "ToCountry": {
+                    "type": "string"
+                  },
+                  "FinishedOnKey": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "AccountSid": {
+                  "style": "form"
+                },
+                "ApiVersion": {
+                  "style": "form"
+                },
+                "Called": {
+                  "style": "form"
+                },
+                "CalledCountry": {
+                  "style": "form"
+                },
+                "CalledState": {
+                  "style": "form"
+                },
+                "Caller": {
+                  "style": "form"
+                },
+                "CallerCountry": {
+                  "style": "form"
+                },
+                "CallSid": {
+                  "style": "form"
+                },
+                "CallStatus": {
+                  "style": "form"
+                },
+                "Digits": {
+                  "style": "form"
+                },
+                "Direction": {
+                  "style": "form"
+                },
+                "From": {
+                  "style": "form"
+                },
+                "FromCountry": {
+                  "style": "form"
+                },
+                "To": {
+                  "style": "form"
+                },
+                "ToCountry": {
+                  "style": "form"
+                },
+                "FinishedOnKey": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "TwilioSignature is not valid or failed request validation"
+          }
+        }
+      }
+    },
+    "/{tenant}/SkipOrderConfirmationEntryPoint": {
+      "post": {
+        "tags": [
+          "CustomerOrderInfo"
+        ],
+        "summary": "Returns twilio instructions to play order information, based on phone number specified at callRequest.From property, skipping order confirmation part",
+        "operationId": "SkipOrderConfirmationEntryPoint",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "description": "Available values : uk",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Twilio-Signature",
+            "in": "header",
+            "description": "The X-Twilio-Signature header attached to the request used to validate requests coming from Twilio",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "confirmedOrderId",
+            "in": "query",
+            "description": "Order id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "call-type",
+            "in": "query",
+            "description": "Available values : je-test-redirect-to-qa-agent, je-test-order-id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "AccountSid": {
+                    "type": "string"
+                  },
+                  "ApiVersion": {
+                    "type": "string"
+                  },
+                  "Called": {
+                    "type": "string"
+                  },
+                  "CalledCountry": {
+                    "type": "string"
+                  },
+                  "CalledState": {
+                    "type": "string"
+                  },
+                  "Caller": {
+                    "type": "string"
+                  },
+                  "CallerCountry": {
+                    "type": "string"
+                  },
+                  "CallSid": {
+                    "type": "string"
+                  },
+                  "CallStatus": {
+                    "type": "string"
+                  },
+                  "Digits": {
+                    "type": "string"
+                  },
+                  "Direction": {
+                    "type": "string"
+                  },
+                  "From": {
+                    "type": "string"
+                  },
+                  "FromCountry": {
+                    "type": "string"
+                  },
+                  "To": {
+                    "type": "string"
+                  },
+                  "ToCountry": {
+                    "type": "string"
+                  },
+                  "FinishedOnKey": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "AccountSid": {
+                  "style": "form"
+                },
+                "ApiVersion": {
+                  "style": "form"
+                },
+                "Called": {
+                  "style": "form"
+                },
+                "CalledCountry": {
+                  "style": "form"
+                },
+                "CalledState": {
+                  "style": "form"
+                },
+                "Caller": {
+                  "style": "form"
+                },
+                "CallerCountry": {
+                  "style": "form"
+                },
+                "CallSid": {
+                  "style": "form"
+                },
+                "CallStatus": {
+                  "style": "form"
+                },
+                "Digits": {
+                  "style": "form"
+                },
+                "Direction": {
+                  "style": "form"
+                },
+                "From": {
+                  "style": "form"
+                },
+                "FromCountry": {
+                  "style": "form"
+                },
+                "To": {
+                  "style": "form"
+                },
+                "ToCountry": {
+                  "style": "form"
+                },
+                "FinishedOnKey": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "TwilioSignature is not valid or failed request validation"
+          }
+        }
+      }
+    },
+    "/twilioivr/{tenant}/SkipOrderConfirmationEntryPoint": {
+      "post": {
+        "tags": [
+          "CustomerOrderInfo"
+        ],
+        "summary": "Returns twilio instructions to play order information, based on phone number specified at callRequest.From property, skipping order confirmation part",
+        "operationId": "SkipOrderConfirmationEntryPoint",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "description": "Available values : uk",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Twilio-Signature",
+            "in": "header",
+            "description": "The X-Twilio-Signature header attached to the request used to validate requests coming from Twilio",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "confirmedOrderId",
+            "in": "query",
+            "description": "Order id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "call-type",
+            "in": "query",
+            "description": "Available values : je-test-redirect-to-qa-agent, je-test-order-id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "AccountSid": {
+                    "type": "string"
+                  },
+                  "ApiVersion": {
+                    "type": "string"
+                  },
+                  "Called": {
+                    "type": "string"
+                  },
+                  "CalledCountry": {
+                    "type": "string"
+                  },
+                  "CalledState": {
+                    "type": "string"
+                  },
+                  "Caller": {
+                    "type": "string"
+                  },
+                  "CallerCountry": {
+                    "type": "string"
+                  },
+                  "CallSid": {
+                    "type": "string"
+                  },
+                  "CallStatus": {
+                    "type": "string"
+                  },
+                  "Digits": {
+                    "type": "string"
+                  },
+                  "Direction": {
+                    "type": "string"
+                  },
+                  "From": {
+                    "type": "string"
+                  },
+                  "FromCountry": {
+                    "type": "string"
+                  },
+                  "To": {
+                    "type": "string"
+                  },
+                  "ToCountry": {
+                    "type": "string"
+                  },
+                  "FinishedOnKey": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "AccountSid": {
+                  "style": "form"
+                },
+                "ApiVersion": {
+                  "style": "form"
+                },
+                "Called": {
+                  "style": "form"
+                },
+                "CalledCountry": {
+                  "style": "form"
+                },
+                "CalledState": {
+                  "style": "form"
+                },
+                "Caller": {
+                  "style": "form"
+                },
+                "CallerCountry": {
+                  "style": "form"
+                },
+                "CallSid": {
+                  "style": "form"
+                },
+                "CallStatus": {
+                  "style": "form"
+                },
+                "Digits": {
+                  "style": "form"
+                },
+                "Direction": {
+                  "style": "form"
+                },
+                "From": {
+                  "style": "form"
+                },
+                "FromCountry": {
+                  "style": "form"
+                },
+                "To": {
+                  "style": "form"
+                },
+                "ToCountry": {
+                  "style": "form"
+                },
+                "FinishedOnKey": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "TwilioSignature is not valid or failed request validation"
+          }
+        }
+      }
+    },
+    "/{tenant}/ValidateOrderId": {
+      "post": {
+        "tags": [
+          "CustomerOrderInfo"
+        ],
+        "summary": "Returns twilio instructions to validate order id entered by caller",
+        "operationId": "ValidateOrderId",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "description": "Available values : uk",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Twilio-Signature",
+            "in": "header",
+            "description": "The X-Twilio-Signature header attached to the request used to validate requests coming from Twilio",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "validationTries",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "call-type",
+            "in": "query",
+            "description": "Available values : je-test-redirect-to-qa-agent, je-test-order-id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "AccountSid": {
+                    "type": "string"
+                  },
+                  "ApiVersion": {
+                    "type": "string"
+                  },
+                  "Called": {
+                    "type": "string"
+                  },
+                  "CalledCountry": {
+                    "type": "string"
+                  },
+                  "CalledState": {
+                    "type": "string"
+                  },
+                  "Caller": {
+                    "type": "string"
+                  },
+                  "CallerCountry": {
+                    "type": "string"
+                  },
+                  "CallSid": {
+                    "type": "string"
+                  },
+                  "CallStatus": {
+                    "type": "string"
+                  },
+                  "Digits": {
+                    "type": "string"
+                  },
+                  "Direction": {
+                    "type": "string"
+                  },
+                  "From": {
+                    "type": "string"
+                  },
+                  "FromCountry": {
+                    "type": "string"
+                  },
+                  "To": {
+                    "type": "string"
+                  },
+                  "ToCountry": {
+                    "type": "string"
+                  },
+                  "FinishedOnKey": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "AccountSid": {
+                  "style": "form"
+                },
+                "ApiVersion": {
+                  "style": "form"
+                },
+                "Called": {
+                  "style": "form"
+                },
+                "CalledCountry": {
+                  "style": "form"
+                },
+                "CalledState": {
+                  "style": "form"
+                },
+                "Caller": {
+                  "style": "form"
+                },
+                "CallerCountry": {
+                  "style": "form"
+                },
+                "CallSid": {
+                  "style": "form"
+                },
+                "CallStatus": {
+                  "style": "form"
+                },
+                "Digits": {
+                  "style": "form"
+                },
+                "Direction": {
+                  "style": "form"
+                },
+                "From": {
+                  "style": "form"
+                },
+                "FromCountry": {
+                  "style": "form"
+                },
+                "To": {
+                  "style": "form"
+                },
+                "ToCountry": {
+                  "style": "form"
+                },
+                "FinishedOnKey": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "TwilioSignature is not valid or failed request validation"
+          }
+        }
+      }
+    },
+    "/twilioivr/{tenant}/ValidateOrderId": {
+      "post": {
+        "tags": [
+          "CustomerOrderInfo"
+        ],
+        "summary": "Returns twilio instructions to validate order id entered by caller",
+        "operationId": "ValidateOrderId",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "description": "Available values : uk",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Twilio-Signature",
+            "in": "header",
+            "description": "The X-Twilio-Signature header attached to the request used to validate requests coming from Twilio",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "validationTries",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "call-type",
+            "in": "query",
+            "description": "Available values : je-test-redirect-to-qa-agent, je-test-order-id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "AccountSid": {
+                    "type": "string"
+                  },
+                  "ApiVersion": {
+                    "type": "string"
+                  },
+                  "Called": {
+                    "type": "string"
+                  },
+                  "CalledCountry": {
+                    "type": "string"
+                  },
+                  "CalledState": {
+                    "type": "string"
+                  },
+                  "Caller": {
+                    "type": "string"
+                  },
+                  "CallerCountry": {
+                    "type": "string"
+                  },
+                  "CallSid": {
+                    "type": "string"
+                  },
+                  "CallStatus": {
+                    "type": "string"
+                  },
+                  "Digits": {
+                    "type": "string"
+                  },
+                  "Direction": {
+                    "type": "string"
+                  },
+                  "From": {
+                    "type": "string"
+                  },
+                  "FromCountry": {
+                    "type": "string"
+                  },
+                  "To": {
+                    "type": "string"
+                  },
+                  "ToCountry": {
+                    "type": "string"
+                  },
+                  "FinishedOnKey": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "AccountSid": {
+                  "style": "form"
+                },
+                "ApiVersion": {
+                  "style": "form"
+                },
+                "Called": {
+                  "style": "form"
+                },
+                "CalledCountry": {
+                  "style": "form"
+                },
+                "CalledState": {
+                  "style": "form"
+                },
+                "Caller": {
+                  "style": "form"
+                },
+                "CallerCountry": {
+                  "style": "form"
+                },
+                "CallSid": {
+                  "style": "form"
+                },
+                "CallStatus": {
+                  "style": "form"
+                },
+                "Digits": {
+                  "style": "form"
+                },
+                "Direction": {
+                  "style": "form"
+                },
+                "From": {
+                  "style": "form"
+                },
+                "FromCountry": {
+                  "style": "form"
+                },
+                "To": {
+                  "style": "form"
+                },
+                "ToCountry": {
+                  "style": "form"
+                },
+                "FinishedOnKey": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "TwilioSignature is not valid or failed request validation"
+          }
+        }
+      }
+    },
+    "/{tenant}/ForwardToAgent": {
+      "post": {
+        "tags": [
+          "CustomerOrderInfo"
+        ],
+        "summary": "Returns twilio instructions to forward caller to agent",
+        "operationId": "ForwardToAgent",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "description": "Available values : uk",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Twilio-Signature",
+            "in": "header",
+            "description": "The X-Twilio-Signature header attached to the request used to validate requests coming from Twilio",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "friendlyConfirmedOrderReference",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "call-type",
+            "in": "query",
+            "description": "Available values : je-test-redirect-to-qa-agent, je-test-order-id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "AccountSid": {
+                    "type": "string"
+                  },
+                  "ApiVersion": {
+                    "type": "string"
+                  },
+                  "Called": {
+                    "type": "string"
+                  },
+                  "CalledCountry": {
+                    "type": "string"
+                  },
+                  "CalledState": {
+                    "type": "string"
+                  },
+                  "Caller": {
+                    "type": "string"
+                  },
+                  "CallerCountry": {
+                    "type": "string"
+                  },
+                  "CallSid": {
+                    "type": "string"
+                  },
+                  "CallStatus": {
+                    "type": "string"
+                  },
+                  "Digits": {
+                    "type": "string"
+                  },
+                  "Direction": {
+                    "type": "string"
+                  },
+                  "From": {
+                    "type": "string"
+                  },
+                  "FromCountry": {
+                    "type": "string"
+                  },
+                  "To": {
+                    "type": "string"
+                  },
+                  "ToCountry": {
+                    "type": "string"
+                  },
+                  "FinishedOnKey": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "AccountSid": {
+                  "style": "form"
+                },
+                "ApiVersion": {
+                  "style": "form"
+                },
+                "Called": {
+                  "style": "form"
+                },
+                "CalledCountry": {
+                  "style": "form"
+                },
+                "CalledState": {
+                  "style": "form"
+                },
+                "Caller": {
+                  "style": "form"
+                },
+                "CallerCountry": {
+                  "style": "form"
+                },
+                "CallSid": {
+                  "style": "form"
+                },
+                "CallStatus": {
+                  "style": "form"
+                },
+                "Digits": {
+                  "style": "form"
+                },
+                "Direction": {
+                  "style": "form"
+                },
+                "From": {
+                  "style": "form"
+                },
+                "FromCountry": {
+                  "style": "form"
+                },
+                "To": {
+                  "style": "form"
+                },
+                "ToCountry": {
+                  "style": "form"
+                },
+                "FinishedOnKey": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "TwilioSignature is not valid or failed request validation"
+          }
+        }
+      }
+    },
+    "/twilioivr/{tenant}/ForwardToAgent": {
+      "post": {
+        "tags": [
+          "CustomerOrderInfo"
+        ],
+        "summary": "Returns twilio instructions to forward caller to agent",
+        "operationId": "ForwardToAgent",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "description": "Available values : uk",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Twilio-Signature",
+            "in": "header",
+            "description": "The X-Twilio-Signature header attached to the request used to validate requests coming from Twilio",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "friendlyConfirmedOrderReference",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "call-type",
+            "in": "query",
+            "description": "Available values : je-test-redirect-to-qa-agent, je-test-order-id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "AccountSid": {
+                    "type": "string"
+                  },
+                  "ApiVersion": {
+                    "type": "string"
+                  },
+                  "Called": {
+                    "type": "string"
+                  },
+                  "CalledCountry": {
+                    "type": "string"
+                  },
+                  "CalledState": {
+                    "type": "string"
+                  },
+                  "Caller": {
+                    "type": "string"
+                  },
+                  "CallerCountry": {
+                    "type": "string"
+                  },
+                  "CallSid": {
+                    "type": "string"
+                  },
+                  "CallStatus": {
+                    "type": "string"
+                  },
+                  "Digits": {
+                    "type": "string"
+                  },
+                  "Direction": {
+                    "type": "string"
+                  },
+                  "From": {
+                    "type": "string"
+                  },
+                  "FromCountry": {
+                    "type": "string"
+                  },
+                  "To": {
+                    "type": "string"
+                  },
+                  "ToCountry": {
+                    "type": "string"
+                  },
+                  "FinishedOnKey": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "AccountSid": {
+                  "style": "form"
+                },
+                "ApiVersion": {
+                  "style": "form"
+                },
+                "Called": {
+                  "style": "form"
+                },
+                "CalledCountry": {
+                  "style": "form"
+                },
+                "CalledState": {
+                  "style": "form"
+                },
+                "Caller": {
+                  "style": "form"
+                },
+                "CallerCountry": {
+                  "style": "form"
+                },
+                "CallSid": {
+                  "style": "form"
+                },
+                "CallStatus": {
+                  "style": "form"
+                },
+                "Digits": {
+                  "style": "form"
+                },
+                "Direction": {
+                  "style": "form"
+                },
+                "From": {
+                  "style": "form"
+                },
+                "FromCountry": {
+                  "style": "form"
+                },
+                "To": {
+                  "style": "form"
+                },
+                "ToCountry": {
+                  "style": "form"
+                },
+                "FinishedOnKey": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "TwilioSignature is not valid or failed request validation"
+          }
+        }
+      }
+    },
+    "/{tenant}/PostOrderInfoForwardOption": {
+      "post": {
+        "tags": [
+          "CustomerOrderInfo"
+        ],
+        "summary": "Returns twilio instructions based on customer selection",
+        "operationId": "PostOrderInfoForwardOption",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "description": "Available values : uk",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Twilio-Signature",
+            "in": "header",
+            "description": "The X-Twilio-Signature header attached to the request used to validate requests coming from Twilio",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "confirmedOrderId",
+            "in": "query",
+            "description": "Order id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "call-type",
+            "in": "query",
+            "description": "Available values : je-test-redirect-to-qa-agent, je-test-order-id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "AccountSid": {
+                    "type": "string"
+                  },
+                  "ApiVersion": {
+                    "type": "string"
+                  },
+                  "Called": {
+                    "type": "string"
+                  },
+                  "CalledCountry": {
+                    "type": "string"
+                  },
+                  "CalledState": {
+                    "type": "string"
+                  },
+                  "Caller": {
+                    "type": "string"
+                  },
+                  "CallerCountry": {
+                    "type": "string"
+                  },
+                  "CallSid": {
+                    "type": "string"
+                  },
+                  "CallStatus": {
+                    "type": "string"
+                  },
+                  "Digits": {
+                    "type": "string"
+                  },
+                  "Direction": {
+                    "type": "string"
+                  },
+                  "From": {
+                    "type": "string"
+                  },
+                  "FromCountry": {
+                    "type": "string"
+                  },
+                  "To": {
+                    "type": "string"
+                  },
+                  "ToCountry": {
+                    "type": "string"
+                  },
+                  "FinishedOnKey": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "AccountSid": {
+                  "style": "form"
+                },
+                "ApiVersion": {
+                  "style": "form"
+                },
+                "Called": {
+                  "style": "form"
+                },
+                "CalledCountry": {
+                  "style": "form"
+                },
+                "CalledState": {
+                  "style": "form"
+                },
+                "Caller": {
+                  "style": "form"
+                },
+                "CallerCountry": {
+                  "style": "form"
+                },
+                "CallSid": {
+                  "style": "form"
+                },
+                "CallStatus": {
+                  "style": "form"
+                },
+                "Digits": {
+                  "style": "form"
+                },
+                "Direction": {
+                  "style": "form"
+                },
+                "From": {
+                  "style": "form"
+                },
+                "FromCountry": {
+                  "style": "form"
+                },
+                "To": {
+                  "style": "form"
+                },
+                "ToCountry": {
+                  "style": "form"
+                },
+                "FinishedOnKey": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "TwilioSignature is not valid or failed request validation"
+          }
+        }
+      }
+    },
+    "/twilioivr/{tenant}/PostOrderInfoForwardOption": {
+      "post": {
+        "tags": [
+          "CustomerOrderInfo"
+        ],
+        "summary": "Returns twilio instructions based on customer selection",
+        "operationId": "PostOrderInfoForwardOption",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "description": "Available values : uk",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Twilio-Signature",
+            "in": "header",
+            "description": "The X-Twilio-Signature header attached to the request used to validate requests coming from Twilio",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "confirmedOrderId",
+            "in": "query",
+            "description": "Order id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "call-type",
+            "in": "query",
+            "description": "Available values : je-test-redirect-to-qa-agent, je-test-order-id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "AccountSid": {
+                    "type": "string"
+                  },
+                  "ApiVersion": {
+                    "type": "string"
+                  },
+                  "Called": {
+                    "type": "string"
+                  },
+                  "CalledCountry": {
+                    "type": "string"
+                  },
+                  "CalledState": {
+                    "type": "string"
+                  },
+                  "Caller": {
+                    "type": "string"
+                  },
+                  "CallerCountry": {
+                    "type": "string"
+                  },
+                  "CallSid": {
+                    "type": "string"
+                  },
+                  "CallStatus": {
+                    "type": "string"
+                  },
+                  "Digits": {
+                    "type": "string"
+                  },
+                  "Direction": {
+                    "type": "string"
+                  },
+                  "From": {
+                    "type": "string"
+                  },
+                  "FromCountry": {
+                    "type": "string"
+                  },
+                  "To": {
+                    "type": "string"
+                  },
+                  "ToCountry": {
+                    "type": "string"
+                  },
+                  "FinishedOnKey": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "AccountSid": {
+                  "style": "form"
+                },
+                "ApiVersion": {
+                  "style": "form"
+                },
+                "Called": {
+                  "style": "form"
+                },
+                "CalledCountry": {
+                  "style": "form"
+                },
+                "CalledState": {
+                  "style": "form"
+                },
+                "Caller": {
+                  "style": "form"
+                },
+                "CallerCountry": {
+                  "style": "form"
+                },
+                "CallSid": {
+                  "style": "form"
+                },
+                "CallStatus": {
+                  "style": "form"
+                },
+                "Digits": {
+                  "style": "form"
+                },
+                "Direction": {
+                  "style": "form"
+                },
+                "From": {
+                  "style": "form"
+                },
+                "FromCountry": {
+                  "style": "form"
+                },
+                "To": {
+                  "style": "form"
+                },
+                "ToCountry": {
+                  "style": "form"
+                },
+                "FinishedOnKey": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwiMLResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "TwilioSignature is not valid or failed request validation"
+          }
+        }
+      }
+    },
+    "/external/vouchers/{tenant}": {
+      "post": {
+        "tags": [
+          "Vouchers"
+        ],
+        "operationId": "Vouchers_CreateSingleVoucherExternal",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "voucherGroup",
+          "content": {
+            "application/json": {
+              "schema": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/VoucherGroup"
+                  }
+                ]
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateDeliveryHoursRequest": {
+        "type": "object",
+        "properties": {
+          "monday": {
+            "$ref": "#/components/schemas/DeliveryHoursForDay"
+          },
+          "tuesday": {
+            "$ref": "#/components/schemas/DeliveryHoursForDay"
+          },
+          "wednesday": {
+            "$ref": "#/components/schemas/DeliveryHoursForDay"
+          },
+          "thursday": {
+            "$ref": "#/components/schemas/DeliveryHoursForDay"
+          },
+          "friday": {
+            "$ref": "#/components/schemas/DeliveryHoursForDay"
+          },
+          "saturday": {
+            "$ref": "#/components/schemas/DeliveryHoursForDay"
+          },
+          "sunday": {
+            "$ref": "#/components/schemas/DeliveryHoursForDay"
+          }
+        }
+      },
+      "DeliveryHoursForDay": {
+        "type": "object",
+        "properties": {
+          "closed": {
+            "type": "boolean"
+          },
+          "poolTimes": {
+            "uniqueItems": false,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoolTime"
+            }
+          }
+        }
+      },
+      "PoolTime": {
+        "type": "object",
+        "properties": {
+          "startTime": {
+            "type": "string"
+          },
+          "endTime": {
+            "type": "string"
+          }
+        }
+      },
+      "RelativePoolAvailabilityResponse": {
+        "type": "object",
+        "properties": {
+          "bestGuess": {
+            "type": "string"
+          }
+        }
+      },
+      "RelativePoolAvailability": {
+        "type": "object",
+        "properties": {
+          "bestGuess": {
+            "type": "string"
+          }
+        }
+      },
+      "GetDeliveryPoolsResponseItem": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "timeZone": {
+            "type": "string"
+          },
+          "restaurants": {
+            "uniqueItems": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "CreateDeliveryPoolRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "timeZone": {
+            "type": "string"
+          },
+          "poolZone": {
+            "type": "string"
+          },
+          "restaurants": {
+            "uniqueItems": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "GetDeliveryPoolResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "timeZone": {
+            "type": "string"
+          },
+          "poolZone": {
+            "type": "string"
+          },
+          "restaurants": {
+            "uniqueItems": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "EditDeliveryPoolRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "timeZone": {
+            "type": "string"
+          },
+          "poolZone": {
+            "type": "string"
+          },
+          "restaurants": {
+            "uniqueItems": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "EditDeliveryPoolResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "timeZone": {
+            "type": "string"
+          },
+          "poolZone": {
+            "type": "string"
+          },
+          "restaurants": {
+            "uniqueItems": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "ReplaceDeliveryPoolRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "timeZone": {
+            "type": "string"
+          },
+          "poolZone": {
+            "type": "string"
+          },
+          "restaurants": {
+            "uniqueItems": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "AddPoolRestaurantsRequest": {
+        "type": "object",
+        "properties": {
+          "restaurants": {
+            "uniqueItems": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "RemovePoolRestaurantsRequest": {
+        "type": "object",
+        "properties": {
+          "restaurants": {
+            "uniqueItems": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "DriverAtRestaurantEtaBody": {
+        "type": "object",
+        "properties": {
+          "estimatedAt": {
+            "type": "string",
+            "description": "Time that the estimate was created",
+            "format": "date-time"
+          },
+          "bestGuess": {
+            "type": "string",
+            "description": "Estimate of when the driver will arrive at the restaurant",
+            "format": "date-time"
+          }
+        }
+      },
+      "DeliveryDriverAssignedBody": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "$ref": "#/components/schemas/DeliveryServiceLocation"
+          },
+          "timeStampWithUtcOffset": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "driverName": {
+            "type": "string"
+          },
+          "driverContactNumber": {
+            "type": "string"
+          },
+          "vehicleDetails": {
+            "$ref": "#/components/schemas/VehicleDetails"
+          },
+          "etaAtRestaurant": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "etaAtDeliveryAddress": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DeliveryServiceLocation": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "speed": {
+            "type": "number",
+            "format": "double"
+          },
+          "heading": {
+            "type": "number",
+            "format": "double"
+          },
+          "accuracy": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "VehicleDetails": {
+        "type": "object",
+        "properties": {
+          "vehicle": {
+            "type": "string"
+          },
+          "vehicleRegistration": {
+            "type": "string"
+          }
+        }
+      },
+      "DeliveryDetails": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "$ref": "#/components/schemas/DeliveryServiceLocation"
+          },
+          "timeStampWithUtcOffset": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DriverAtRestaurantDetails": {
+        "type": "object",
+        "properties": {
+          "etaAtDeliveryAddress": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "location": {
+            "$ref": "#/components/schemas/DeliveryServiceLocation"
+          },
+          "timeStampWithUtcOffset": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DriverLocationBody": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "$ref": "#/components/schemas/DeliveryServiceLocation"
+          },
+          "timeStampWithUtcOffset": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "etaAtDeliveryAddress": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "etaAtRestaurant": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BulkDriverLocation": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string"
+          },
+          "location": {
+            "$ref": "#/components/schemas/DeliveryServiceLocation"
+          },
+          "timeStampWithUtcOffset": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "etaAtDeliveryAddress": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "etaAtRestaurant": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OnItsWayDetails": {
+        "type": "object",
+        "properties": {
+          "estimatedArrivalTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "location": {
+            "$ref": "#/components/schemas/DeliveryServiceLocation"
+          },
+          "timeStampWithUtcOffset": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AcceptOrderRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "timeAcceptedFor": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "RejectOrderRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CancelOrderRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "WebhookCallbackRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "Status"
+        ],
+        "properties": {
+          "Status": {
+            "$ref": "#/components/schemas/CallbackStatus"
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Data": {
+            "nullable": true
+          }
+        }
+      },
+      "CallbackStatus": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Success",
+          "Failure"
+        ],
+        "enum": [
+          0,
+          1
+        ]
+      },
+      "RestaurantTemporaryOffline": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Status": {
+            "$ref": "#/components/schemas/TempOfflineStatus"
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TempOfflineStatus": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "TempOffline",
+          "ClosedToday",
+          "None"
+        ],
+        "enum": [
+          1,
+          2,
+          6
+        ]
+      },
+      "UpdateOrderStatusRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Status": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "TimeStamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Data": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "TimeAcceptedFor": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "OrderRequestV2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "OrderReference": {
+            "type": "string",
+            "nullable": true
+          },
+          "FriendlyOrderReference": {
+            "type": "string",
+            "nullable": true
+          },
+          "CustomerNotes": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "IsTest": {
+            "type": "boolean"
+          },
+          "TotalPrice": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "Restaurant": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RestaurantV2"
+              }
+            ]
+          },
+          "Customer": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CustomerV2"
+              }
+            ]
+          },
+          "Fulfilment": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FulfilmentV2"
+              }
+            ]
+          },
+          "Payment": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PaymentV2"
+              }
+            ]
+          },
+          "Items": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/ItemV2"
+            }
+          }
+        }
+      },
+      "RestaurantV2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Reference": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CustomerV2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Email": {
+            "type": "string",
+            "nullable": true
+          },
+          "PhoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "DisplayPhoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Address": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AddressV2"
+              }
+            ]
+          }
+        }
+      },
+      "AddressV2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Lines": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "City": {
+            "type": "string",
+            "nullable": true
+          },
+          "PostalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "GeoLocation": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Location"
+              }
+            ]
+          }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "Longitude": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "FulfilmentV2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Method": {
+            "type": "string",
+            "nullable": true
+          },
+          "DueDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "DueAsap": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PaymentV2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "PaidDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Tips": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/PaymentItemV2"
+            }
+          },
+          "Fees": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/PaymentItemV2"
+            }
+          },
+          "Taxes": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/PaymentTaxItemV2"
+            }
+          },
+          "Lines": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/PaymentLineItemV2"
+            }
+          }
+        }
+      },
+      "PaymentItemV2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Type": {
+            "type": "string",
+            "nullable": true
+          },
+          "Value": {
+            "type": "number",
+            "format": "decimal"
+          }
+        }
+      },
+      "PaymentTaxItemV2": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PaymentItemV2"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "Percentage": {
+                "type": "number",
+                "format": "decimal"
+              }
+            }
+          }
+        ]
+      },
+      "PaymentLineItemV2": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PaymentItemV2"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "Paid": {
+                "type": "boolean"
+              },
+              "LastCardDigits": {
+                "type": "string",
+                "nullable": true
+              },
+              "ServiceFee": {
+                "type": "number",
+                "format": "decimal"
+              }
+            }
+          }
+        ]
+      },
+      "ItemV2": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SubItemV2"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "TotalPrice": {
+                "type": "number",
+                "format": "decimal"
+              }
+            }
+          }
+        ]
+      },
+      "SubItemV2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Reference": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "UnitPrice": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "Items": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/SubItemV2"
+            }
+          }
+        }
+      },
+      "OrderRepresentation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "OrderId": {
+            "type": "string",
+            "nullable": true
+          },
+          "PartnerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "LatestStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "OrderReference": {
+            "type": "string",
+            "nullable": true
+          },
+          "FriendlyOrderReference": {
+            "type": "string",
+            "nullable": true
+          },
+          "CustomerNote": {
+            "type": "string",
+            "nullable": true
+          },
+          "PlacedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "DueDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "EventUpdateUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "Fulfillment": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FulfillmentViewModel"
+              }
+            ]
+          },
+          "Payment": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PaymentInfoViewModel"
+              }
+            ]
+          },
+          "Customer": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ContactViewModel"
+              }
+            ]
+          },
+          "Restaurant": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RestaurantViewModel"
+              }
+            ]
+          },
+          "Rds": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RdsContactViewModel"
+              }
+            ]
+          },
+          "Basket": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/BasketItemViewModel"
+            }
+          }
+        }
+      },
+      "FulfillmentViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "PickupTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Method": {
+            "type": "string",
+            "nullable": true
+          },
+          "Table": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PaymentInfoViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "DriverTipValue": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "Total": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "CashOnDelivery": {
+            "type": "boolean"
+          },
+          "RestaurantTipValue": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "DeliveryCharge": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "CardCharges": {
+            "type": "number",
+            "format": "decimal"
+          }
+        }
+      },
+      "ContactViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Reference": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Address": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AddressViewModel"
+              }
+            ]
+          },
+          "PhoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Email": {
+            "type": "string",
+            "nullable": true
+          },
+          "Location": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationViewModel"
+              }
+            ]
+          }
+        }
+      },
+      "AddressViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "AddressLines": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "City": {
+            "type": "string",
+            "nullable": true
+          },
+          "Postcode": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "LocationViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Latitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Longitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "RestaurantViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Reference": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Address": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AddressViewModel"
+              }
+            ]
+          },
+          "PhoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Email": {
+            "type": "string",
+            "nullable": true
+          },
+          "Location": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationViewModel"
+              }
+            ]
+          }
+        }
+      },
+      "RdsContactViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Reference": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Address": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AddressViewModel"
+              }
+            ]
+          },
+          "PhoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Email": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "BasketItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ItemReference": {
+            "type": "string",
+            "maxLength": 32,
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "Comment": {
+            "type": "string",
+            "nullable": true
+          },
+          "Count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CostPerItem": {
+            "type": "number",
+            "format": "decimal"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FilterRequestModel": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OfflineRequestModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "filter": {
+            "$ref": "#/components/schemas/FilterRequestModel"
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "allowOverride": {
+            "type": "boolean"
+          },
+          "allowRestaurantOverride": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Operation": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "object"
+          },
+          "path": {
+            "type": "string"
+          },
+          "op": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OfflineRestaurantRequestModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "allowRestaurantOverride": {
+            "type": "boolean"
+          },
+          "legacyTempOfflineType": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OfflineRestaurantsRequestModel": {
+        "type": "object",
+        "properties": {
+          "restaurantIds": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "allowRestaurantOverride": {
+            "type": "boolean"
+          },
+          "legacyTempOfflineType": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TwiMLResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
+      "VoucherGroup": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Discount": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Discount"
+              }
+            ]
+          },
+          "Validity": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Validity"
+              }
+            ]
+          },
+          "CreatedBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "Created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Updated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Hidden": {
+            "type": "boolean"
+          },
+          "Archived": {
+            "type": "boolean"
+          },
+          "GroupType": {
+            "$ref": "#/components/schemas/GroupType"
+          },
+          "StaticCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "Source": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Discount": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "VoucherType": {
+            "$ref": "#/components/schemas/VoucherType"
+          },
+          "Amount": {
+            "type": "number",
+            "format": "decimal"
+          }
+        }
+      },
+      "VoucherType": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Absolute",
+          "Percentage",
+          "DeliveryFee"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "Validity": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "StartDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "EndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Platform": {
+            "type": "string",
+            "nullable": true
+          },
+          "PostCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "MinimumSpend": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "RestaurantIds": {
+            "type": "string",
+            "nullable": true
+          },
+          "ServiceType": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ServiceType"
+              }
+            ]
+          },
+          "RestrictedToConsumerStatus": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ConsumerStatus"
+              }
+            ]
+          },
+          "PaymentOptionTypes": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "ValidFromHour": {
+            "type": "string",
+            "format": "time-span",
+            "nullable": true
+          },
+          "ValidToHour": {
+            "type": "string",
+            "format": "time-span",
+            "nullable": true
+          },
+          "ValidOnDays": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/DayOfWeek"
+            }
+          },
+          "OrderNumberValidity": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/OrderNumberValidity"
+              }
+            ]
+          },
+          "CuisineIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ServiceType": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Collection",
+          "Delivery"
+        ],
+        "enum": [
+          1,
+          2
+        ]
+      },
+      "ConsumerStatus": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Undefined",
+          "NewConsumer",
+          "ReturnConsumer"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "DayOfWeek": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "OrderNumberValidity": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ComparisonOperator": {
+            "type": "string",
+            "nullable": true
+          },
+          "NumberOfOrders": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "GroupType": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Unknown",
+          "DynamicSingleUse",
+          "StaticMultipleUse"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      }
+    },
+    "securitySchemes": {
+      "JE-API-KEY": {
+        "type": "apiKey",
+        "description": "Some calls require HTTPS and an Authorization Key which will be provided by Just Eat.The key needs to be provided in the header as follows: <b>Authorization: JE-API-KEY {Your-Key-Here}</b>",
+        "name": "Authorization",
+        "in": "header"
+      },
+      "APIKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "<p>All api calls require an Authorization Key which will be provided by JUST EAT.<p><p>The key needs to be provided in the header as follows: </p><p><b>Authorization: JE-API-KEY {Your-Key-Here}</b></p>The key is case sensitive."
+      }
+    }
+  },
+  "servers": [
+    {
+      "description": "Delivery Service External API",
+      "url": "http://uk-deliveryserviceexternalapi.just-eat.co.uk"
+    }
+  ],
+  "externalDocs": {
+    "description": "JUST EAT Developer Contextual Documentation",
+    "url": "https://developers.justeat.com"
+  },
+  "tags": [
+    {
+      "name": "api",
+      "description": "JustEat API partner endpoints via deliveryserviceexternalapi.just-eat.co.uk are described in this document"
+    }
+  ],
+  "x-explorer-enabled": true,
+  "x-proxy-enabled": true,
+  "x-samples-enabled": true,
+  "x-samples-languages": [
+    "curl",
+    "node",
+    "ruby",
+    "javascript",
+    "python"
+  ]
+}
