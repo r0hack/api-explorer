@@ -47,14 +47,6 @@
       }
     }
   },
-  "code-examples.json": {
-    "preferred": "1.0.0",
-    "versions": {
-      "1.0.0": {
-        "swaggerUrl": "swagger-files/code-examples.json"
-      }
-    }
-  },
   "customer-castle.json": {
     "preferred": "1.0",
     "versions": {
