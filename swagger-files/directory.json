@@ -47,11 +47,11 @@
       }
     }
   },
-  "cognigytest.json": {
-    "preferred": "3.3",
+  "code-examples.json": {
+    "preferred": "1.0.0",
     "versions": {
-      "3.3": {
-        "swaggerUrl": "swagger-files/cognigytest.json"
+      "1.0.0": {
+        "swaggerUrl": "swagger-files/code-examples.json"
       }
     }
   },
@@ -76,6 +76,14 @@
     "versions": {
       "v1": {
         "swaggerUrl": "swagger-files/customer-justeat.json"
+      }
+    }
+  },
+  "customer-lasso.json": {
+    "preferred": "1.0.36",
+    "versions": {
+      "1.0.36": {
+        "swaggerUrl": "swagger-files/customer-lasso.json"
       }
     }
   },
