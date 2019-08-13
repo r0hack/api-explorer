@@ -47,6 +47,14 @@
       }
     }
   },
+  "cognigytest.json": {
+    "preferred": "3.3",
+    "versions": {
+      "3.3": {
+        "swaggerUrl": "swagger-files/cognigytest.json"
+      }
+    }
+  },
   "endpoint-error-boundary.json": {
     "preferred": "1.0.0",
     "versions": {
