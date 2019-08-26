@@ -90,7 +90,7 @@ class ResponseSchema extends React.Component {
     return (
       <div
         className={classNames('hub-reference-response-definitions', {
-          dark: this.props.theme === 'dark',
+          dark: this.props.theme,
         })}
       >
         {this.renderHeader()}
@@ -110,7 +110,11 @@ class ResponseSchema extends React.Component {
 ResponseSchema.propTypes = {
   operation: PropTypes.instanceOf(Operation).isRequired,
   oas: PropTypes.instanceOf(Oas).isRequired,
-  theme: PropTypes.string.isRequired,
+  theme: PropTypes.string,
+};
+
+ResponseSchema.defaultProps = {
+  theme: 'dark',
 };
 
 module.exports = ResponseSchema;

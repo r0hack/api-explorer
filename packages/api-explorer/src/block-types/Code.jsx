@@ -60,7 +60,15 @@ class BlockCode extends React.Component {
 
           <div className="block-code-code">
             {codes.map((code, i) => {
-              return <CodeElement code={code} activeTab={i === this.state.activeTab} dark={dark} />;
+              const key = `${code.language}-${i}`;
+              return (
+                <CodeElement
+                  key={key}
+                  code={code}
+                  activeTab={i === this.state.activeTab}
+                  dark={dark}
+                />
+              );
             })}
           </div>
         </div>
@@ -72,7 +80,11 @@ class BlockCode extends React.Component {
 BlockCode.propTypes = {
   block: PropTypes.shape({
     data: PropTypes.shape({
-      codes: PropTypes.array,
+      // Allow objects through while testing so we can test bad code states.
+      codes:
+        process.env.NODE_ENV === 'test'
+          ? PropTypes.oneOfType([PropTypes.array, PropTypes.object])
+          : PropTypes.array,
     }),
   }),
   opts: PropTypes.shape({

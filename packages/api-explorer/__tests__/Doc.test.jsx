@@ -52,7 +52,7 @@ test('should output a div', () => {
   expect(doc.find('Content').length).toBe(1);
 });
 
-test('should render straight away if `appearance.splitReferenceDocs` is true', () => {
+test.only('should render straight away if `appearance.splitReferenceDocs` is true', () => {
   const doc = mount(
     <Doc
       {...props}

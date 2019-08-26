@@ -68,11 +68,10 @@ class CodeSample extends React.Component {
           {examplesWithLanguages.map((example, index) => {
             const { key, selected } = this.getKey(example, index);
             return (
-              <div style={{ display: selected ? 'block' : 'none' }}>
-                <CopyCode key={`copy-${key}`} code={example.code} />
+              <div key={`copy-${key}`} style={{ display: selected ? 'block' : 'none' }}>
+                {typeof example.code !== 'undefined' && <CopyCode code={example.code} />}
                 <pre
                   className="tomorrow-night tabber-body"
-                  key={key} // eslint-disable-line react/no-array-index-key
                   style={{ display: selected ? 'block' : '' }}
                 >
                   {syntaxHighlighter(example.code || '', example.language, { dark: true })}
@@ -136,18 +135,20 @@ CodeSample.propTypes = {
   oas: PropTypes.instanceOf(Oas).isRequired,
   setLanguage: PropTypes.func.isRequired,
   operation: PropTypes.instanceOf(Operation).isRequired,
-  formData: PropTypes.shape({}).isRequired,
-  auth: PropTypes.shape({}).isRequired,
+  formData: PropTypes.shape({}),
+  auth: PropTypes.shape({}),
   examples: PropTypes.arrayOf(
     PropTypes.shape({
-      language: PropTypes.string.isRequired,
-      code: PropTypes.string.isRequired,
+      language: PropTypes.string,
+      code: PropTypes.string,
     }),
   ),
   language: PropTypes.string.isRequired,
 };
 
 CodeSample.defaultProps = {
+  auth: {},
+  formData: {},
   examples: [],
 };
 

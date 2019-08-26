@@ -15,6 +15,7 @@ const props = {
   oas,
   operation: oas.operation('/pet', 'post'),
   selected: 0,
+  setResponseType: () => {},
   setExampleTab: () => {},
 };
 

@@ -79,7 +79,6 @@ test('Code will render status code within em tag', () => {
 
 test('If codes array is not passed as an array expect empty array', () => {
   const codeInput = mount(<Code block={badBlock} />);
-
   expect(codeInput.find('span').text()).toBe('');
 });
 
