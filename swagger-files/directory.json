@@ -47,11 +47,11 @@
       }
     }
   },
-  "cognigytest.json": {
-    "preferred": "3.3",
+  "company-parseable.json": {
+    "preferred": "1.0.0",
     "versions": {
-      "3.3": {
-        "swaggerUrl": "swagger-files/cognigytest.json"
+      "1.0.0": {
+        "swaggerUrl": "swagger-files/company-parseable.json"
       }
     }
   },
