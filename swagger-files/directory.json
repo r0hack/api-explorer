@@ -47,6 +47,14 @@
       }
     }
   },
+  "common-parameters.json": {
+    "preferred": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "swaggerUrl": "swagger-files/common-parameters.json"
+      }
+    }
+  },
   "endpoint-error-boundary.json": {
     "preferred": "1.0.0",
     "versions": {
