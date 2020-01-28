@@ -55,6 +55,14 @@
       }
     }
   },
+  "crowdtrike.json": {
+    "preferred": "1.0.0-beta",
+    "versions": {
+      "1.0.0-beta": {
+        "swaggerUrl": "swagger-files/crowdtrike.json"
+      }
+    }
+  },
   "endpoint-error-boundary.json": {
     "preferred": "1.0.0",
     "versions": {
