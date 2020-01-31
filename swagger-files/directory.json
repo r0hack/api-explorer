@@ -31,6 +31,14 @@
       }
     }
   },
+  "avinode.json": {
+    "preferred": "2020-01-29T06:27:25.517081Z",
+    "versions": {
+      "2020-01-29T06:27:25.517081Z": {
+        "swaggerUrl": "swagger-files/avinode.json"
+      }
+    }
+  },
   "boolean.json": {
     "preferred": "1.0.0",
     "versions": {
