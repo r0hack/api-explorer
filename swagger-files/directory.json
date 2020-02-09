@@ -127,6 +127,14 @@
       }
     }
   },
+  "pubapi-swagger.json": {
+    "preferred": "0.0.0",
+    "versions": {
+      "0.0.0": {
+        "swaggerUrl": "swagger-files/pubapi-swagger.json"
+      }
+    }
+  },
   "raw-body.json": {
     "preferred": "1.0.0",
     "versions": {
