@@ -1,9 +1,8 @@
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <http://feross.org>
- * @license  MIT
- */
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/
 
 /*!
   Copyright (c) 2017 Jed Watson.
@@ -12,22 +11,38 @@
 */
 
 /*!
+ * Determine if an object is a Buffer
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ */
+
+/*!
+ * JavaScript Cookie v2.2.1
+ * https://github.com/js-cookie/js-cookie
+ *
+ * Copyright 2006, 2015 Klaus Hartl & Fagner Brack
+ * Released under the MIT license
+ */
+
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <http://feross.org>
+ * @license  MIT
+ */
+
+/*!
  * repeat-string <https://github.com/jonschlinkert/repeat-string>
  *
  * Copyright (c) 2014-2015, Jon Schlinkert.
  * Licensed under the MIT License.
  */
 
-/*
-object-assign
-(c) Sindre Sorhus
-@license MIT
-*/
+/*! https://mths.be/punycode v1.4.1 by @mathias */
 
-/** @license URI.js v4.2.1 (c) 2011 Gary Court. License: http://github.com/garycourt/uri-js */
-
-/** @license React v16.12.0
- * react.production.min.js
+/** @license React v0.18.0
+ * scheduler.production.min.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -44,8 +59,8 @@ object-assign
  * LICENSE file in the root directory of this source tree.
  */
 
-/** @license React v0.18.0
- * scheduler.production.min.js
+/** @license React v16.12.0
+ * react.production.min.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -53,19 +68,4 @@ object-assign
  * LICENSE file in the root directory of this source tree.
  */
 
-/*! https://mths.be/punycode v1.4.1 by @mathias */
-
-/*!
- * JavaScript Cookie v2.2.1
- * https://github.com/js-cookie/js-cookie
- *
- * Copyright 2006, 2015 Klaus Hartl & Fagner Brack
- * Released under the MIT license
- */
-
-/*!
- * Determine if an object is a Buffer
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
+/** @license URI.js v4.2.1 (c) 2011 Gary Court. License: http://github.com/garycourt/uri-js */
