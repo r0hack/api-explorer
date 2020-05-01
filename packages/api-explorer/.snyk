@@ -1,0 +1,28 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.14.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-567746:
+    - oas > lodash:
+        patched: '2020-05-01T03:33:12.651Z'
+    - oas > inquirer > lodash:
+        patched: '2020-05-01T03:33:12.651Z'
+    - oas > swagger-inline > lodash:
+        patched: '2020-05-01T03:33:12.651Z'
+    - '@readme/oas-to-har > oas > lodash':
+        patched: '2020-05-01T03:33:12.651Z'
+    - '@readme/oas-to-har > oas > inquirer > lodash':
+        patched: '2020-05-01T03:33:12.651Z'
+    - oas > swagger-inline > multilang-extract-comments > lodash:
+        patched: '2020-05-01T03:33:12.651Z'
+    - '@readme/oas-to-har > oas > swagger-inline > lodash':
+        patched: '2020-05-01T03:33:12.651Z'
+    - httpsnippet > form-data > async > lodash:
+        patched: '2020-05-01T03:33:12.651Z'
+    - oas > swagger-inline > multilang-extract-comments > comment-patterns > lodash:
+        patched: '2020-05-01T03:33:12.651Z'
+    - '@readme/oas-to-har > oas > swagger-inline > multilang-extract-comments > lodash':
+        patched: '2020-05-01T03:33:12.651Z'
+    - '@readme/oas-to-har > oas > swagger-inline > multilang-extract-comments > comment-patterns > lodash':
+        patched: '2020-05-01T03:33:12.651Z'
